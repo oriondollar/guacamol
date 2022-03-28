@@ -6,7 +6,6 @@ import numpy as np
 
 from guacamol.utils.chemistry import canonicalize_list, is_valid, calculate_pc_descriptors, continuous_kldiv, \
     discrete_kldiv, calculate_internal_pairwise_similarities
-from guacamol.distribution_matching_generator import DistributionMatchingGenerator
 from guacamol.utils.data import get_random_subset
 from guacamol.utils.sampling_helpers import sample_valid_molecules, sample_unique_molecules
 
@@ -47,7 +46,7 @@ class DistributionLearningBenchmark:
         self.number_samples = number_samples
 
     @abstractmethod
-    def assess_model(self, model: DistributionMatchingGenerator) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
         """
         Assess a distribution-matching generator model.
 
@@ -64,7 +63,7 @@ class ValidityBenchmark(DistributionLearningBenchmark):
     def __init__(self, number_samples) -> None:
         super().__init__(name='Validity', number_samples=number_samples)
 
-    def assess_model(self, model: DistributionMatchingGenerator) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
         start_time = time.time()
         molecules = model.generate(number_samples=self.number_samples)
         end_time = time.time()
@@ -93,7 +92,7 @@ class UniquenessBenchmark(DistributionLearningBenchmark):
     def __init__(self, number_samples) -> None:
         super().__init__(name='Uniqueness', number_samples=number_samples)
 
-    def assess_model(self, model: DistributionMatchingGenerator) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
         start_time = time.time()
         molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
         end_time = time.time()
@@ -126,7 +125,7 @@ class NoveltyBenchmark(DistributionLearningBenchmark):
         super().__init__(name='Novelty', number_samples=number_samples)
         self.training_set_molecules = set(canonicalize_list(training_set, include_stereocenters=False))
 
-    def assess_model(self, model: DistributionMatchingGenerator) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
         """
         Assess a distribution-matching generator model.
 
@@ -184,7 +183,7 @@ class KLDivBenchmark(DistributionLearningBenchmark):
             'NumAromaticRings'
         ]
 
-    def assess_model(self, model: DistributionMatchingGenerator) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
         """
         Assess a distribution-matching generator model.
 

@@ -6,7 +6,6 @@ from typing import List, Dict, Any
 
 import guacamol
 from guacamol.distribution_learning_benchmark import DistributionLearningBenchmark, DistributionLearningBenchmarkResult
-from guacamol.distribution_matching_generator import DistributionMatchingGenerator
 from guacamol.benchmark_suites import distribution_learning_benchmark_suite
 from guacamol.utils.data import get_time_string
 
@@ -14,7 +13,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-def assess_distribution_learning(model: DistributionMatchingGenerator,
+def assess_distribution_learning(model,
                                  chembl_training_file: str,
                                  json_output_file='output_distribution_learning.json',
                                  benchmark_version='v1') -> None:
@@ -34,7 +33,7 @@ def assess_distribution_learning(model: DistributionMatchingGenerator,
                                   number_samples=10000)
 
 
-def _assess_distribution_learning(model: DistributionMatchingGenerator,
+def _assess_distribution_learning(model,
                                   chembl_training_file: str,
                                   json_output_file: str,
                                   benchmark_version: str,
@@ -62,7 +61,7 @@ def _assess_distribution_learning(model: DistributionMatchingGenerator,
         f.write(json.dumps(benchmark_results, indent=4))
 
 
-def _evaluate_distribution_learning_benchmarks(model: DistributionMatchingGenerator,
+def _evaluate_distribution_learning_benchmarks(model,
                                                benchmarks: List[DistributionLearningBenchmark]
                                                ) -> List[DistributionLearningBenchmarkResult]:
     """
