@@ -74,17 +74,16 @@ def _evaluate_distribution_learning_benchmarks(model,
         json_output_file: Name of the file where to save the results in JSON format
     """
 
-    logger.info(f'Number of benchmarks: {len(benchmarks)}')
+    print(f'Number of benchmarks: {len(benchmarks)}')
 
     results = []
     for i, benchmark in enumerate(benchmarks, 1):
-        print(benchmark.name)
-        logger.info(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
+        print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
         result = benchmark.assess_model(model)
-        logger.info(f'Results for the benchmark "{result.benchmark_name}":')
-        logger.info(f'  Score: {result.score:.6f}')
-        logger.info(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
-        logger.info(f'  Metadata: {result.metadata}')
+        print(f'Results for the benchmark "{result.benchmark_name}":')
+        print(f'  Score: {result.score:.6f}')
+        print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
+        print(f'  Metadata: {result.metadata}')
         results.append(result)
 
     logger.info('Finished execution of the benchmarks')
