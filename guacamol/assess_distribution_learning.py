@@ -78,6 +78,7 @@ def _evaluate_distribution_learning_benchmarks(model,
 
     results = []
     for i, benchmark in enumerate(benchmarks, 1):
+        print(benchmark.name)
         logger.info(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
         result = benchmark.assess_model(model)
         logger.info(f'Results for the benchmark "{result.benchmark_name}":')
