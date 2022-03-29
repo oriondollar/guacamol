@@ -9,7 +9,6 @@ import fcd
 import numpy as np
 
 from guacamol.distribution_learning_benchmark import DistributionLearningBenchmark, DistributionLearningBenchmarkResult
-from guacamol.distribution_matching_generator import DistributionMatchingGenerator
 from guacamol.utils.data import get_random_subset
 from guacamol.utils.sampling_helpers import sample_valid_molecules
 
@@ -40,7 +39,7 @@ class FrechetBenchmark(DistributionLearningBenchmark):
 
         self.reference_molecules = get_random_subset(training_set, self.sample_size, seed=42)
 
-    def assess_model(self, model: DistributionMatchingGenerator) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
         chemnet = self._load_chemnet()
 
         start_time = time.time()
