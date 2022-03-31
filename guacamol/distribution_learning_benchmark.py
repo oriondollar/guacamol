@@ -5,7 +5,7 @@ from typing import Dict, Any, Iterable, List
 import numpy as np
 
 from guacamol.utils.chemistry import canonicalize_list, is_valid, calculate_pc_descriptors, continuous_kldiv, \
-    discrete_kldiv, calculate_internal_pairwise_similarities
+    discrete_kldiv, calculate_internal_pairwise_similarities, tokenizer
 from guacamol.utils.data import get_random_subset
 from guacamol.utils.sampling_helpers import sample_valid_molecules, sample_unique_molecules
 
@@ -248,4 +248,66 @@ class KLDivBenchmark(DistributionLearningBenchmark):
         return DistributionLearningBenchmarkResult(benchmark_name=self.name,
                                                    score=score,
                                                    sampling_time=end_time - start_time,
+                                                   metadata=metadata)
+
+class ReconstructionBenchmark(DistributionLearningBenchmark):
+    """
+    Computes the reconstruction accuracy for a set of holdout molecules
+    """
+    def __init__(self, test_set: List[str], sample_size: int) -> None:
+        """
+        Args:
+            test_set: list of smiles to reconstruct
+            sample_size: number of smiles to reconstruct
+        """
+        super().__init__(name='Reconstruction', number_samples=sample_size)
+        self.test_set_molecules = canonicalize_list(get_random_subset(test_set, self.number_samples, seed=42),
+                                                    include_stereocenters=False)
+        self.test_set_tokenized = [tokenizer(smi) for smi in self.test_set_molecules]
+
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
+        """
+        Assess a distribution-matching generator model
+
+        Args:
+            model: model to assess
+        """
+        start_time = time.time()
+        reconstructed_smiles = model.reconstruct(self.test_set_molecules)
+        reconstructed_tokenized = [tokenizer(smi) for smi in reconstructed_smiles]
+        smiles_accs = []
+        hits = 0
+        misses = 0
+        position_accs = np.zeros((2, model.args.max_length+1))
+
+        for in_smi, out_smi in zip(self.test_set_tokenized, reconstructed_tokenized):
+            if in_smi == out_smi:
+                smile_accs.append(1)
+            else:
+                smile_accs.append(0)
+
+            misses += abs(len(in_smi) - len(out_smi))
+            for j, (token_in, token_out) in enumerate(zip(in_smi, out_smi)):
+                if token_in == token_out:
+                    hits += 1
+                    position_accs[0,j] += 1
+                else:
+                    misses += 1
+                position_accs[1,j] += 1
+
+        smile_acc = np.mean(smile_accs)
+        token_acc = hits / (hits + misses)
+        position_acc = []
+        for i in range(model.args.max_length+1):
+            position_acc.append(position_accs[0,i] / position_accs[1,i])
+        score = (smile_acc, token_acc, position_acc)
+
+        metadata = {
+            'number_samples': self.number_samples,
+            'accuracy_types': ['smiles', 'tokens', 'positional']
+        }
+
+        return DistributionLearningBenchmarkResult(benchmark_name=self.name,
+                                                   score=score,
+                                                   sampling_time=end_time-start_time,
                                                    metadata=metadata)

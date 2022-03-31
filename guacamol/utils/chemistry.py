@@ -76,6 +76,13 @@ def canonicalize_list(smiles_list: Iterable[str], include_stereocenters=True) ->
 
     return remove_duplicates(canonicalized_smiles)
 
+def tokenizer(smile):
+    "Tokenizes SMILES/SELFIES string"
+    pattern =  "(\[[^\]]+]|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|=|#|-|\+|\\\\|\/|_|:|~|@|\?|>|\*|\$|\%[0-9]{2}|[0-9])"
+    regezz = re.compile(pattern)
+    tokens = [token for token in regezz.findall(smile)]
+    assert smile == ''.join(tokens), ("{} could not be joined".format(smile))
+    return tokens
 
 def smiles_to_rdkit_mol(smiles: str) -> Optional[Chem.Mol]:
     """
