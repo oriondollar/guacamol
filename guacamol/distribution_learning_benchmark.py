@@ -275,7 +275,7 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
         start_time = time.time()
         reconstructed_smiles = model.reconstruct(self.test_set_molecules)
         reconstructed_tokenized = [tokenizer(smi) for smi in reconstructed_smiles]
-        smiles_accs = []
+        smile_accs = []
         hits = 0
         misses = 0
         position_accs = np.zeros((2, model.args.max_length+1))
