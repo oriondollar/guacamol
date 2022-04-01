@@ -80,7 +80,7 @@ def _evaluate_distribution_learning_benchmarks(model,
     prior_gen = []
     for i, benchmark in enumerate(benchmarks, 1):
         print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
-        if ('Validity' in benchmark.name or 'Unique' in benchmark.name or 'Novel' in benchmark.name) and return_gen = True:
+        if ('Validity' in benchmark.name or 'Unique' in benchmark.name or 'Novel' in benchmark.name) and return_gen == True:
             result, prior_gen = benchmark.assess_model(model, prior_gen)
         else:
             result = benchmark.assess_model(model)
