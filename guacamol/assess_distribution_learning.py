@@ -62,7 +62,7 @@ def _assess_distribution_learning(model,
 
 
 def _evaluate_distribution_learning_benchmarks(model,
-                                               benchmarks: List[DistributionLearningBenchmark]
+                                               benchmarks: List[DistributionLearningBenchmark],
                                                return_gen=True) -> List[DistributionLearningBenchmarkResult]:
     """
     Evaluate a model with the given benchmarks.
