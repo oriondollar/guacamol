@@ -119,7 +119,7 @@ def sample_novel_molecules(model, number_molecules: int, train_molecules: Iterab
 
         for smile in samples:
             if is_valid(smile):
-                canonical_smiles = canonicalize(smiles)
+                canonical_smiles = canonicalize(smile)
                 if canonical_smiles is not None and canonical_smiles not in unique_set:
                     unique_list.append(canonical_smiles)
 
