@@ -87,7 +87,7 @@ class ValidityBenchmark(DistributionLearningBenchmark):
         metadata = {
             'number_samples': self.number_samples,
             'number_valid': number_valid,
-            'use_filters': use_filters
+            'use_filters': self.use_filters
         }
 
         result = DistributionLearningBenchmarkResult(benchmark_name=self.name,
