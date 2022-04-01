@@ -71,3 +71,46 @@ def sample_unique_molecules(model, number_molecules: int, max_tries=10) -> List[
     assert len(unique_set) == len(unique_list)
 
     return unique_list
+
+def sample_novel_molecules(model, number_molecules: int, train_molecules: Iterable[str], max_tries=10) -> List[str]:
+    """
+    Sample from the given generator until the desired number of novel (distinct from
+    training set) molecules have been sampled
+
+    Args:
+        model: model to sample from
+        number_molecules: number of novel molecules to generate
+        train_molecules: molecules used to train the generator
+        max_tries: determines the maximum number N of samples to draw, N = number_molecules * max_tries
+
+    Returns:
+        A list of number_molecules novel molecules, in canonilized form.
+        If this was not possible with the given max_tries, the list may be shorter.
+        The generation order is kept
+    """
+    train_molecules = set(canonicalize_list(train_molecules, include_stereocenters=False))
+
+    max_samples = max_tries * number_molecules
+    number_already_sampled = 0
+
+    unique_list: List[str] = []
+    unique_set: Set[str] = set()
+
+    novel_list: List[str] = []
+
+    while len(unique_list) < number_molecules and number_already_sampled < max_samples:
+        remaining_to_sample = number_molecules - len(novel_list)
+
+        samples = model.generate(remaining_to_sample)
+        number_already_sampled += remaining_to_sample
+
+        for smile in samples:
+            canonical_smiles = canonicalize(smiles)
+            if canonical_smiles is not None and canonical_smiles not in unique_set:
+                unique_set.add(canonical_smiles)
+                unique_list.append(canonical_smiles)
+
+        novel_set = unique_set.difference(train_molecules)
+        novel_list += list(novel_set)
+
+    return novel_list
