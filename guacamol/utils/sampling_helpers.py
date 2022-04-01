@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List, Set, Iterable
 
 from guacamol.utils.chemistry import is_valid, canonicalize
 
