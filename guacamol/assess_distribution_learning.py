@@ -63,7 +63,7 @@ def _assess_distribution_learning(model,
 
 def _evaluate_distribution_learning_benchmarks(model,
                                                benchmarks: List[DistributionLearningBenchmark]
-                                               ) -> List[DistributionLearningBenchmarkResult]:
+                                               return_gen=True) -> List[DistributionLearningBenchmarkResult]:
     """
     Evaluate a model with the given benchmarks.
     Should not be called directly except for testing purposes.
@@ -77,9 +77,13 @@ def _evaluate_distribution_learning_benchmarks(model,
     print(f'Number of benchmarks: {len(benchmarks)}')
 
     results = []
+    prior_gen = None
     for i, benchmark in enumerate(benchmarks, 1):
         print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
-        result = benchmark.assess_model(model)
+        if ('Validity' in benchmark.name or 'Unique' in benchmark.name or 'Novel' in benchmark.name) and return_gen = True:
+            result, prior_gen = benchmark.assess_model(model, prior_gen)
+        else:
+            result = benchmark.assess_model(model)
         print(f'Results for the benchmark "{result.benchmark_name}":')
         print(f'  Score: {result.score:.6f}')
         print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')

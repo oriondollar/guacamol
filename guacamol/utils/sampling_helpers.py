@@ -1,9 +1,10 @@
 from typing import List, Set, Iterable
 
-from guacamol.utils.chemistry import is_valid, canonicalize
+from guacamol.utils.chemistry import is_valid, canonicalize, pass_through_filters
 
 
-def sample_valid_molecules(model, number_molecules: int, max_tries=10) -> List[str]:
+def sample_valid_molecules(model, number_molecules: int, prior_gen=None,
+                           use_filters=False, max_tries=10) -> List[str]:
     """
     Sample from the given generator until the desired number of valid molecules
     has been sampled (i.e., ignore invalid molecules).
@@ -18,9 +19,9 @@ def sample_valid_molecules(model, number_molecules: int, max_tries=10) -> List[s
     """
 
     max_samples = max_tries * number_molecules
-    number_already_sampled = 0
+    number_already_sampled = len(prior_gen)
 
-    valid_molecules: List[str] = []
+    valid_molecules = prior_gen
 
     while len(valid_molecules) < number_molecules and number_already_sampled < max_samples:
         remaining_to_sample = number_molecules - len(valid_molecules)
@@ -29,6 +30,8 @@ def sample_valid_molecules(model, number_molecules: int, max_tries=10) -> List[s
         number_already_sampled += remaining_to_sample
 
         valid_molecules += [m for m in samples if is_valid(m)]
+        if use_filters:
+            valid_molecules = pass_through_filters(valid_molecules)
 
     return valid_molecules
 
