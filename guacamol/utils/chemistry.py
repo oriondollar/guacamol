@@ -1,5 +1,6 @@
 import logging
 import re
+from collections import Counter
 from typing import Optional, List, Iterable, Collection, Tuple
 
 import numpy as np
@@ -75,6 +76,15 @@ def canonicalize_list(smiles_list: Iterable[str], include_stereocenters=True) ->
     canonicalized_smiles = [s for s in canonicalized_smiles if s is not None]
 
     return remove_duplicates(canonicalized_smiles)
+
+def fragment_list(smiles_list: Iterable[str]) -> Counter:
+    fragments = Counter()
+    mols = [Chem.MolFromSmiles(smi) for smi in smiles_list]
+    for mol in mols:
+        fgs = AllChem.FragmentOnBRICSBonds(mol)
+        fgs_smi = Chem.MolToSmiles(fgs).split(".")
+        fragments.update(fgs_smi)
+    return fragments
 
 def tokenizer(smile):
     "Tokenizes SMILES/SELFIES string"

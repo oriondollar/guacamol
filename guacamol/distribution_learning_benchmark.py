@@ -4,8 +4,9 @@ from abc import abstractmethod
 from typing import Dict, Any, Iterable, List
 import numpy as np
 
+from guacamol.utils.math import cos_similarity
 from guacamol.utils.chemistry import canonicalize_list, is_valid, calculate_pc_descriptors, continuous_kldiv, \
-    discrete_kldiv, calculate_internal_pairwise_similarities, tokenizer
+    discrete_kldiv, calculate_internal_pairwise_similarities, tokenizer, fragment_list
 from guacamol.utils.data import get_random_subset
 from guacamol.utils.sampling_helpers import sample_valid_molecules, sample_unique_molecules
 
@@ -309,6 +310,44 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
         }
 
         return DistributionLearningBenchmarkResult(benchmark_name=self.name,
+                                                   score=score,
+                                                   sampling_time=end_time-start_time,
+                                                   metadata=metadata)
+
+class FragBenchmark(DistributionLearningBenchmark):
+    """
+    Computes the cosine similarity between generated fragments and holdout set fragments
+    """
+    def __init__(self, test_set: List[str], sample_size: int, type: str) -> None:
+        """
+        Args:
+            test_set: list of smiles to use for fragment comparison
+            sample_size: number of smiles to sample
+        """
+        super().__init__(name='Frag', number_samples=sample_size)
+        self.type = type
+        self.ref_frags = fragment_list(test_set)
+
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
+        """
+        Assess a distribution-matching generator model
+
+        Args:
+            model: model to assess
+        """
+        start_time = time.time()
+        molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
+        mol_frags = fragment_list(molecules)
+        end_time = time.time()
+
+        metadata = {
+            'number_samples': self.number_samples,
+            'number_valid': len(molecules)
+        }
+
+        score = cos_similarity(self.ref_frags, mol_frags)
+
+        return DistributionLearningBenchmarkResult(benchmark_name=self.name+'_{}'.format(self.type),
                                                    score=score,
                                                    sampling_time=end_time-start_time,
                                                    metadata=metadata)
