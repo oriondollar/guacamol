@@ -7,7 +7,7 @@ import numpy as np
 from guacamol.utils.math import cos_similarity
 from guacamol.utils.chemistry import canonicalize_list, is_valid, calculate_pc_descriptors, continuous_kldiv, \
     discrete_kldiv, calculate_internal_pairwise_similarities, tokenizer, fragment_list, scaffold_list, \
-    get_fingerprints_from_smileslist, average_agg_tanimoto
+    get_fingerprints_from_smileslist, average_agg_tanimoto, pass_through_filters
 from guacamol.utils.data import get_random_subset
 from guacamol.utils.sampling_helpers import sample_valid_molecules, sample_unique_molecules
 
@@ -65,7 +65,7 @@ class ValidityBenchmark(DistributionLearningBenchmark):
     def __init__(self, number_samples) -> None:
         super().__init__(name='Validity', number_samples=number_samples)
 
-    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model, return_valid=True, use_filters=False):
         start_time = time.time()
         molecules = model.generate(number_samples=self.number_samples)
         end_time = time.time()
@@ -73,17 +73,29 @@ class ValidityBenchmark(DistributionLearningBenchmark):
         if len(molecules) != self.number_samples:
             raise Exception('The model did not generate the correct number of molecules')
 
-        number_valid = sum(1 if is_valid(smiles) else 0 for smiles in molecules)
+        valid = []
+        for smi in molecules:
+            if is_valid(smi):
+                valid.append(smi)
+        if use_filters:
+            valid = pass_through_filters(valid)
+            self.name = self.name + '_filters'
+        number_valid = len(valid)
         validity_ratio = number_valid / self.number_samples
         metadata = {
             'number_samples': self.number_samples,
             'number_valid': number_valid,
+            'use_filters': use_filters
         }
 
-        return DistributionLearningBenchmarkResult(benchmark_name=self.name,
-                                                   score=validity_ratio,
-                                                   sampling_time=end_time - start_time,
-                                                   metadata=metadata)
+        result = DistributionLearningBenchmarkResult(benchmark_name=self.name,
+                                                     score=validity_ratio,
+                                                     sampling_time=end_time - start_time,
+                                                     metadata=metadata)
+        if return_valid:
+            return result, valid
+        else:
+            return result
 
 
 class UniquenessBenchmark(DistributionLearningBenchmark):
@@ -448,7 +460,7 @@ class IntDivBenchmark(DistributionLearningBenchmark):
             model: model to assess
         """
         start_time = time.time()
-        molecules = sample_unique_molecules(model=model, number_molecules=self.number_samples)
+        molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
         gen_fps = np.vstack(get_fingerprints_from_smileslist(molecules))
         end_time = time.time()
 
