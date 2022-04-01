@@ -5,6 +5,7 @@ from typing import Optional, List, Iterable, Collection, Tuple
 
 import torch
 import numpy as np
+import pandas as pd
 from rdkit import Chem
 from rdkit import RDLogger, DataStructs
 from rdkit.Chem import AllChem
