@@ -8,7 +8,8 @@ from guacamol.standard_benchmarks import hard_cobimetinib, similarity, logP_benc
     qed_benchmark, median_camphor_menthol, novelty_benchmark, isomers_c11h24, isomers_c7h8n2o2, isomers_c9h10n2o2pf2cl, \
     frechet_benchmark, tpsa_benchmark, hard_osimertinib, hard_fexofenadine, weird_physchem, start_pop_ranolazine, \
     kldiv_benchmark, perindopril_rings, amlodipine_rings, sitagliptin_replacement, zaleplon_with_other_formula, valsartan_smarts, \
-    median_tadalafil_sildenafil, decoration_hop, scaffold_hop, ranolazine_mpo, pioglitazone_mpo, reconstruction_benchmark
+    median_tadalafil_sildenafil, decoration_hop, scaffold_hop, ranolazine_mpo, pioglitazone_mpo, reconstruction_benchmark, \
+    frag_benchmark
 
 
 def goal_directed_benchmark_suite(version_name: str) -> List[GoalDirectedBenchmark]:
@@ -163,5 +164,7 @@ def distribution_learning_suite_v1(train_file_path: str, test_file_path: str, nu
         novelty_benchmark(training_set_file=train_file_path, number_samples=number_samples),
         kldiv_benchmark(training_set_file=train_file_path, number_samples=number_samples),
         frechet_benchmark(training_set_file=train_file_path, number_samples=number_samples),
-        reconstruction_benchmark(test_set_file=test_file_path, number_samples=number_samples)
+        reconstruction_benchmark(test_set_file=test_file_path, number_samples=number_samples),
+        frag_benchmark(test_set_file=test_file_path, number_samples=number_samples, type='test'),
+        frag_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold')
     ]
