@@ -7,6 +7,7 @@ import numpy as np
 from rdkit import Chem
 from rdkit import RDLogger, DataStructs
 from rdkit.Chem import AllChem
+from rdkit.Chem.Scaffolds import MurckoScaffold
 from rdkit.ML.Descriptors import MoleculeDescriptors
 from scipy import histogram
 from scipy.stats import entropy, gaussian_kde
@@ -85,6 +86,25 @@ def fragment_list(smiles_list: Iterable[str]) -> Counter:
         fgs_smi = Chem.MolToSmiles(fgs).split(".")
         fragments.update(fgs_smi)
     return fragments
+
+def scaffold_list(smiles_list: Iterable[str], min_rings=2) -> Counter:
+    scaffolds = Counter()
+    mols = [Chem.MolFromSmiles(smi) for smi in smiles_list]
+    for mol in mols:
+        try:
+            scaffold = MurckoScaffold.GetScaffoldForMol(mol)
+            n_rings = scaffold.GetRingInfo().NumRings()
+            scaffold_smiles = Chem.MolToSmiles(scaffold)
+            if scaffold_smiles == '' or n_rings < min_rings:
+                scaffolds.update(None)
+            else:
+                scaffolds.update(scaffold_smiles)
+        except (ValueError, RuntimeError):
+            scaffolds.update(None)
+    if None in scaffolds:
+        scaffolds.pop(None)
+    return scaffolds
+
 
 def tokenizer(smile):
     "Tokenizes SMILES/SELFIES string"
