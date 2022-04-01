@@ -61,6 +61,24 @@ def average_agg_tanimoto(stock_vecs, gen_vecs,
         agg_tanimoto = (agg_tanimoto)**(1/p)
     return np.mean(agg_tanimoto)
 
+def pass_through_filters(smiles, filters_dir='filters'):
+    """Filters SMILES strings based on method implemented in
+    http://nlp.seas.harvard.edu/2018/04/03/attention.html"""
+    _mcf = pd.read_csv('{}/mcf.csv'.format(filters_dir))
+    _pains = pd.read_csv('{}/wehi_pains.csv'.format(filters_dir), names=['smarts', 'names'])
+    _filters = [Chem.MolFromSmarts(x) for x in
+                _mcf.append(_pains, sort=True)['smarts'].values]
+    filtered_smiles = []
+    for smi in smiles:
+        mol = Chem.MolFromSmiles(smi)
+        h_mol = Chem.AddHs(mol)
+        filtered = False
+        if any(h_mol.HasSubstructMatch(smarts) for smarts in _filters):
+            filtered = True
+        if not filtered:
+            filtered_smiles.append(smi)
+    return filtered_smiles
+
 def is_valid(smiles: str):
     """
     Verifies whether a SMILES string corresponds to a valid molecule.
