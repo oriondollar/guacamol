@@ -1,6 +1,6 @@
 from typing import List, Set, Iterable
 
-from guacamol.utils.chemistry import is_valid, canonicalize, pass_through_filters
+from guacamol.utils.chemistry import is_valid, canonicalize, canonicalize_list, pass_through_filters
 
 
 def sample_valid_molecules(model, number_molecules: int, prior_gen=[],
@@ -126,7 +126,7 @@ def sample_novel_molecules(model, number_molecules: int, train_molecules: Iterab
         if use_filters:
             unique_list = pass_through_filters(unique_list)
         unique_set = set(unique_list)
-        
+
         novel_set = unique_set.difference(train_molecules)
         novel_list = list(novel_set)
 
