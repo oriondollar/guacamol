@@ -3,6 +3,7 @@ import re
 from collections import Counter
 from typing import Optional, List, Iterable, Collection, Tuple
 
+import torch
 import numpy as np
 from rdkit import Chem
 from rdkit import RDLogger, DataStructs
