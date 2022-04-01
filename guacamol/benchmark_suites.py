@@ -1,7 +1,7 @@
 from typing import List
 
 from guacamol.distribution_learning_benchmark import DistributionLearningBenchmark, ValidityBenchmark, \
-    UniquenessBenchmark
+    UniquenessBenchmark, IntDivBenchmark
 from guacamol.goal_directed_benchmark import GoalDirectedBenchmark
 from guacamol.scoring_function import ArithmeticMeanScoringFunction
 from guacamol.standard_benchmarks import hard_cobimetinib, similarity, logP_benchmark, cns_mpo, \
@@ -169,5 +169,7 @@ def distribution_learning_suite_v1(train_file_path: str, test_file_path: str, nu
         frag_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'),
         scaf_benchmark(test_set_file=test_file_path, number_samples=number_smamples, type='test'),
         scaf_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'),
-        snn_benchmark(test_set_file=test_file_path, number_samples=number_samples)
+        snn_benchmark(test_set_file=test_file_path, number_samples=number_samples),
+        IntDivBenchmark(number_samples=number_samples, p=1),
+        IntDivBenchmark(number_samples=number_samples, p=2)
     ]

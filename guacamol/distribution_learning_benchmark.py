@@ -427,3 +427,40 @@ class SNNBenchmark(DistributionLearningBenchmark):
                                                    score=score,
                                                    sampling_time=end_time-start_time,
                                                    metadata=metadata)
+
+class IntDivBenchmark(DistributionLearningBenchmark):
+    """
+    Computes the average max similarities of generated smiles to themselves
+    """
+    def __init__(self, number_samples: int, p: int) -> None:
+        """
+        Args:
+            sample_size: number of smiles to sample
+        """
+        super().__init__(name='IntDiv', number_samples=number_samples)
+        self.p = p
+
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
+        """
+        Assess a distribution-matching generator model
+
+        Args:
+            model: model to assess
+        """
+        start_time = time.time()
+        molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
+        gen_fps = np.vstack(get_fingerprints_from_smileslist(molecules))
+        end_time = time.time()
+
+        metadata = {
+            'number_samples': self.number_samples,
+            'number_valid': len(molecules),
+            'p': self.p
+        }
+
+        score = average_agg_tanimoto(gen_fps, gen_fps, p=self.p)
+
+        return DistributionLearningBenchmarkResult(benchmark_name=self.name+'{}'.format(self.p),
+                                                   score=score,
+                                                   sampling_time=end_time-start_time,
+                                                   metadata=metadata)
