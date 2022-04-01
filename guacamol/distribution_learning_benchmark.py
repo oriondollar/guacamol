@@ -448,7 +448,7 @@ class IntDivBenchmark(DistributionLearningBenchmark):
             model: model to assess
         """
         start_time = time.time()
-        molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
+        molecules = sample_unique_molecules(model=model, number_molecules=self.number_samples)
         gen_fps = np.vstack(get_fingerprints_from_smileslist(molecules))
         end_time = time.time()
 
