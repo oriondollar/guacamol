@@ -6,7 +6,8 @@ import numpy as np
 
 from guacamol.utils.math import cos_similarity
 from guacamol.utils.chemistry import canonicalize_list, is_valid, calculate_pc_descriptors, continuous_kldiv, \
-    discrete_kldiv, calculate_internal_pairwise_similarities, tokenizer, fragment_list, scaffold_list
+    discrete_kldiv, calculate_internal_pairwise_similarities, tokenizer, fragment_list, scaffold_list, \
+    get_fingerprints_from_smileslist, average_agg_tanimoto
 from guacamol.utils.data import get_random_subset
 from guacamol.utils.sampling_helpers import sample_valid_molecules, sample_unique_molecules
 
@@ -386,6 +387,43 @@ class ScafBenchmark(DistributionLearningBenchmark):
         score = cos_similarity(self.ref_scafs, mol_scafs)
 
         return DistributionLearningBenchmarkResult(benchmark_name=self.name+'_{}'.format(self.type),
+                                                   score=score,
+                                                   sampling_time=end_time-start_time,
+                                                   metadata=metadata)
+
+class SNNBenchmark(DistributionLearningBenchmark):
+    """
+    Computes the average max similarities of generated smiles to holdout smiles
+    """
+    def __init__(self, test_set: List[str], sample_size: int) -> None:
+        """
+        Args:
+            test_set: list of smiles to compare to generated set
+            sample_size: number of smiles to sample
+        """
+        super().__init__(name='SNN', number_samples=sample_size)
+        self.test_fps = np.vstack(get_fingerprints_from_smileslist(test_set))
+
+    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
+        """
+        Assess a distribution-matching generator model
+
+        Args:
+            model: model to assess
+        """
+        start_time = time.time()
+        molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
+        gen_fps = np.vstack(get_fingerprints_from_smileslist(molecules))
+        end_time = time.time()
+
+        metadata = {
+            'number_samples': self.number_samples,
+            'number_valid': len(molecules)
+        }
+
+        score = average_agg_tanimoto(self.test_fps, gen_fps)
+
+        return DistributionLearningBenchmarkResult(benchmark_name=self.name,
                                                    score=score,
                                                    sampling_time=end_time-start_time,
                                                    metadata=metadata)

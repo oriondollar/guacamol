@@ -3,7 +3,7 @@ from rdkit import Chem
 from guacamol.common_scoring_functions import TanimotoScoringFunction, RdkitScoringFunction, CNS_MPO_ScoringFunction, \
     IsomerScoringFunction, SMARTSScoringFunction
 from guacamol.distribution_learning_benchmark import DistributionLearningBenchmark, NoveltyBenchmark, KLDivBenchmark, \
-    ReconstructionBenchmark, FragBenchmark, ScafBenchmark
+    ReconstructionBenchmark, FragBenchmark, ScafBenchmark, SNNBenchmark
 from guacamol.frechet_benchmark import FrechetBenchmark
 from guacamol.goal_directed_benchmark import GoalDirectedBenchmark
 from guacamol.goal_directed_score_contributions import uniform_specification
@@ -288,6 +288,10 @@ def frag_benchmark(test_set_file: str, number_samples: int, type: str) -> Distri
 def scaf_benchmark(test_set_file: str, number_samples: int, type: str) -> DistributionLearningBenchmark:
     smiles_list = [s.strip() for s in open(test_set_file).readlines()]
     return ScafBenchmark(test_set=smiles_list, sample_size=number_samples, type=type)
+
+def snn_benchmark(test_set_file: str, number_samples: int) -> DistributionLearningBenchmark:
+    smiles_list = [s.strip() for s in open(test_set_file).readlines()]
+    return SNNBenchmark(test_set=smiles_list, sample_size=number_samples)
 
 def perindopril_rings() -> GoalDirectedBenchmark:
     # perindopril with two aromatic rings

@@ -168,5 +168,6 @@ def distribution_learning_suite_v1(train_file_path: str, test_file_path: str, nu
         frag_benchmark(test_set_file=test_file_path, number_samples=number_samples, type='test'),
         frag_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'),
         scaf_benchmark(test_set_file=test_file_path, number_samples=number_smamples, type='test'),
-        scaf_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold')
+        scaf_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'),
+        snn_benchmark(test_set_file=test_file_path, number_samples=number_samples)
     ]
