@@ -9,8 +9,8 @@ from guacamol.standard_benchmarks import hard_cobimetinib, similarity, logP_benc
     frechet_benchmark, tpsa_benchmark, hard_osimertinib, hard_fexofenadine, weird_physchem, start_pop_ranolazine, \
     kldiv_benchmark, perindopril_rings, amlodipine_rings, sitagliptin_replacement, zaleplon_with_other_formula, valsartan_smarts, \
     median_tadalafil_sildenafil, decoration_hop, scaffold_hop, ranolazine_mpo, pioglitazone_mpo, reconstruction_benchmark, \
-    frag_benchmark
-
+    frag_benchmark, scaf_benchmark, snn_benchmark
+    
 
 def goal_directed_benchmark_suite(version_name: str) -> List[GoalDirectedBenchmark]:
     if version_name == 'v1':
