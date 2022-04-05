@@ -8,7 +8,7 @@ import guacamol
 from guacamol.distribution_learning_benchmark import DistributionLearningBenchmark, DistributionLearningBenchmarkResult, \
     ValidityBenchmark, UniquenessBenchmark
 from guacamol.standard_benchmarks import novelty_benchmark
-from guacamol.sampling_helpers import sample_novel_molecules
+from guacamol.utils.sampling_helpers import sample_novel_molecules
 from guacamol.benchmark_suites import distribution_learning_benchmark_suite
 from guacamol.utils.data import get_time_string
 
