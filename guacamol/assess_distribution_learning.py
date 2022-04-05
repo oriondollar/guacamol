@@ -136,7 +136,10 @@ def _evaluate_distribution_learning_benchmarks(model,
         print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
         result = benchmark.assess_model(model, prior_gen)
         print(f'Results for the benchmark "{result.benchmark_name}":')
-        print(f'  Score: {result.score:.6f}')
+        if result.benchmark_name == 'Reconstruction':
+            print(f'  Score: {result.score[0]:.6f}')
+        else:
+            print(f'  Score: {result.score:6f}')
         print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
         print(f'  Metadata: {result.metadata}')
         results.append(result)
