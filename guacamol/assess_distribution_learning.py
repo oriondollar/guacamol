@@ -97,7 +97,7 @@ def _assess_distribution_learning(model,
         if len(novel) < number_samples:
             print(f'Upsampling to specified number of novel molecules')
             novel = sample_novel_molecules(model, number_molecules=number_samples,
-                                           train_file=train_file_path, prior_gen=novel,
+                                           train_file=train_file, prior_gen=novel,
                                            use_filters=use_filters)
         results += _evaluate_distribution_learning_benchmarks(model=model, benchmarks=benchmarks,
                                                               prior_gen=novel)
