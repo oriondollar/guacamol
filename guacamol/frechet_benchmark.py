@@ -39,11 +39,14 @@ class FrechetBenchmark(DistributionLearningBenchmark):
 
         self.reference_molecules = get_random_subset(training_set, self.sample_size, seed=42)
 
-    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model, prior_gen=[]) -> DistributionLearningBenchmarkResult:
         chemnet = self._load_chemnet()
 
         start_time = time.time()
-        generated_molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
+        if len(prior_gen) > 0:
+            generated_molecules = prior_gen
+        else:
+            generated_molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
         end_time = time.time()
 
         if len(generated_molecules) != self.number_samples:
