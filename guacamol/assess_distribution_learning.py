@@ -131,6 +131,7 @@ def _evaluate_distribution_learning_benchmarks(model,
 
     print(f'Number of benchmarks: {len(benchmarks)}')
 
+    results = []
     for i, benchmark in enumerate(benchmarks, 1):
         print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
         result = benchmark.assess_model(model, prior_gen)
