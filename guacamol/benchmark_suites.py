@@ -10,7 +10,7 @@ from guacamol.standard_benchmarks import hard_cobimetinib, similarity, logP_benc
     kldiv_benchmark, perindopril_rings, amlodipine_rings, sitagliptin_replacement, zaleplon_with_other_formula, valsartan_smarts, \
     median_tadalafil_sildenafil, decoration_hop, scaffold_hop, ranolazine_mpo, pioglitazone_mpo, reconstruction_benchmark, \
     frag_benchmark, scaf_benchmark, snn_benchmark
-    
+
 
 def goal_directed_benchmark_suite(version_name: str) -> List[GoalDirectedBenchmark]:
     if version_name == 'v1':
@@ -188,7 +188,7 @@ def distribution_learning_suite_v2(train_file_path: str, test_file_path: str, te
         reconstruction_benchmark(test_set_file=test_file_path, number_samples=number_samples),
         frag_benchmark(test_set_file=test_file_path, number_samples=number_samples, type='test'),
         frag_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'),
-        scaf_benchmark(test_set_file=test_file_path, number_samples=number_smamples, type='test'),
+        scaf_benchmark(test_set_file=test_file_path, number_samples=number_samples, type='test'),
         scaf_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'),
         snn_benchmark(test_set_file=test_file_path, number_samples=number_samples),
         IntDivBenchmark(number_samples=number_samples, p=1),
