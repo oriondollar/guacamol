@@ -41,7 +41,7 @@ def distribution_learning_benchmark_suite(train_file_path: str,
     """
 
     # For distribution-learning, v1 and v2 are identical
-    if version_name == 'v1' or version_name == 'v2':
+    if version_name == 'v1':
         return distribution_learning_suite_v1(train_file_path=train_file_path,
                                               number_samples=number_samples)
     elif version_name == 'v2':

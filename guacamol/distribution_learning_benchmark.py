@@ -197,7 +197,7 @@ class KLDivBenchmark(DistributionLearningBenchmark):
     Computes the KL divergence between a number of samples and the training set for physchem descriptors
     """
 
-    def __init__(self, number_samples: int, training_set: List[str], return_samples=True, use_filters=False) -> None:
+    def __init__(self, number_samples: int, training_set: List[str], use_filters=False) -> None:
         """
         Args:
             number_samples: number of samples to generate from the model
@@ -217,7 +217,6 @@ class KLDivBenchmark(DistributionLearningBenchmark):
             'NumAliphaticRings',
             'NumAromaticRings'
         ]
-        self.return_samples = return_samples
         self.use_filters = use_filters
 
     def assess_model(self, model, prior_gen=[]):
@@ -289,16 +288,13 @@ class KLDivBenchmark(DistributionLearningBenchmark):
                                                       score=score,
                                                       sampling_time=end_time - start_time,
                                                       metadata=metadata)
-        if self.return_samples:
-            return result, molecules
-        else:
-            return result
+        return result
 
 class ReconstructionBenchmark(DistributionLearningBenchmark):
     """
     Computes the reconstruction accuracy for a set of holdout molecules
     """
-    def __init__(self, test_set: List[str], sample_size: int, return_samples=True, use_filters=False) -> None:
+    def __init__(self, test_set: List[str], sample_size: int, use_filters=False) -> None:
         """
         Args:
             test_set: list of smiles to reconstruct
@@ -308,7 +304,6 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
         self.test_set_molecules = canonicalize_list(get_random_subset(test_set, self.number_samples, seed=42),
                                                     include_stereocenters=False)
         self.test_set_tokenized = [tokenizer(smi) for smi in self.test_set_molecules]
-        self.return_samples = return_samples
         self.use_filters = use_filters
 
     def assess_model(self, model, prior_gen=[]):
@@ -358,16 +353,13 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
                                                      score=score,
                                                      sampling_time=end_time-start_time,
                                                      metadata=metadata)
-        if self.return_samples:
-            return result, prior_gen
-        else:
-            return result
+        return result
 
 class FragBenchmark(DistributionLearningBenchmark):
     """
     Computes the cosine similarity between generated fragments and holdout set fragments
     """
-    def __init__(self, test_set: List[str], sample_size: int, type: str, return_samples=True, use_filters=False) -> None:
+    def __init__(self, test_set: List[str], sample_size: int, type: str, use_filters=False) -> None:
         """
         Args:
             test_set: list of smiles to use for fragment comparison
@@ -376,7 +368,6 @@ class FragBenchmark(DistributionLearningBenchmark):
         super().__init__(name='Frag', number_samples=sample_size)
         self.type = type
         self.ref_frags = fragment_list(test_set)
-        self.return_samples = return_samples
         self.use_filters = use_filters
 
     def assess_model(self, model, prior_gen=[]):
@@ -405,16 +396,13 @@ class FragBenchmark(DistributionLearningBenchmark):
                                                      score=score,
                                                      sampling_time=end_time-start_time,
                                                      metadata=metadata)
-        if self.return_samples:
-            return result, molecules
-        else:
-            return result
+        return result
 
 class ScafBenchmark(DistributionLearningBenchmark):
     """
     Computes the cosine similarity between generated scaffolds and holdout set scaffolds
     """
-    def __init__(self, test_set: List[str], sample_size: int, type: str, return_samples=True, use_filters=False) -> None:
+    def __init__(self, test_set: List[str], sample_size: int, type: str, use_filters=False) -> None:
         """
         Args:
             test_set: list of smiles to use for scaffold comparison
@@ -423,7 +411,6 @@ class ScafBenchmark(DistributionLearningBenchmark):
         super().__init__(name='Scaf', number_samples=sample_size)
         self.type = type
         self.ref_scafs = scaffold_list(test_set)
-        self.return_samples = return_samples
         self.use_filters = use_filters
 
     def assess_model(self, model, prior_gen=[]):
@@ -452,10 +439,7 @@ class ScafBenchmark(DistributionLearningBenchmark):
                                                      score=score,
                                                      sampling_time=end_time-start_time,
                                                      metadata=metadata)
-        if self.return_samples:
-            return result, molecules
-        else:
-            return result
+        return result
 
 class SNNBenchmark(DistributionLearningBenchmark):
     """
