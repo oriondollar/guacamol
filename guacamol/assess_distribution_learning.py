@@ -5,7 +5,10 @@ from collections import OrderedDict
 from typing import List, Dict, Any
 
 import guacamol
-from guacamol.distribution_learning_benchmark import DistributionLearningBenchmark, DistributionLearningBenchmarkResult
+from guacamol.distribution_learning_benchmark import DistributionLearningBenchmark, DistributionLearningBenchmarkResult, \
+    ValidityBenchmark, UniquenessBenchmark
+from guacamol.standard_benchmarks import novelty_benchmark
+from guacamol.sampling_helpers import sample_novel_molecules
 from guacamol.benchmark_suites import distribution_learning_benchmark_suite
 from guacamol.utils.data import get_time_string
 
@@ -14,9 +17,12 @@ logger.addHandler(logging.NullHandler())
 
 
 def assess_distribution_learning(model,
-                                 chembl_training_file: str,
+                                 train_file: str,
+                                 test_file=None,
+                                 test_scaffold_file=None,
+                                 use_filters=False,
                                  json_output_file='output_distribution_learning.json',
-                                 benchmark_version='v1') -> None:
+                                 benchmark_version='v2') -> None:
     """
     Assesses a distribution-matching model for de novo molecule design.
 
@@ -27,14 +33,20 @@ def assess_distribution_learning(model,
         benchmark_version: which benchmark suite to execute
     """
     _assess_distribution_learning(model=model,
-                                  chembl_training_file=chembl_training_file,
+                                  train_file=train_file,
+                                  test_file=test_file,
+                                  test_scaffold_file=test_scaffold_file,
+                                  use_filters=use_filters,
                                   json_output_file=json_output_file,
                                   benchmark_version=benchmark_version,
                                   number_samples=10000)
 
 
 def _assess_distribution_learning(model,
-                                  chembl_training_file: str,
+                                  train_file: str,
+                                  test_file: str,
+                                  test_scaffold_file: str,
+                                  use_filters: bool,
                                   json_output_file: str,
                                   benchmark_version: str,
                                   number_samples: int) -> None:
@@ -43,11 +55,35 @@ def _assess_distribution_learning(model,
     To call directly only for testing.
     """
     logger.info(f'Benchmarking distribution learning, version {benchmark_version}')
-    benchmarks = distribution_learning_benchmark_suite(chembl_file_path=chembl_training_file,
+    benchmarks = distribution_learning_benchmark_suite(train_file_path=train_file,
+                                                       test_file_path=test_file,
+                                                       test_scaffold_file_path=test_scaffold_file,
                                                        version_name=benchmark_version,
                                                        number_samples=number_samples)
 
-    results = _evaluate_distribution_learning_benchmarks(model=model, benchmarks=benchmarks)
+    if version_name == 'v1':
+        results = _evaluate_distribution_learning_benchmarks(model=model, benchmarks=benchmarks)
+    elif version_name == 'v2':
+        results = []
+        validity = ValidityBenchmark(number_samples=number_samples,
+                                     use_filters=use_filters)
+        uniqueness = UniquenessBenchmark(number_samples=number_samples,
+                                         use_filters=use_filters)
+        novelty = novelty_benchmark(train_file_path, number_samples, use_filters=use_filters)
+
+        result, valid = validity.assess_model(model)
+        results.append(result)
+        result, unique = uniqueness.assess_model(model, valid)
+        results.append(result)
+        result, novel = novelty.assess_model(model, unique)
+        results.append(result)
+        if len(novel) < number_samples:
+            novel = sample_novel_molecules(model, number_molecules=number_samples,
+                                           train_file=train_file_path, prior_gen=novel,
+                                           use_filters=use_filters)
+        results += _evaluate_distribution_learning_benchmarks(model=model, benchmarks=benchmarks,
+                                                              prior_gen=novel)
+
 
     benchmark_results: Dict[str, Any] = OrderedDict()
     benchmark_results['guacamol_version'] = guacamol.__version__
@@ -63,7 +99,8 @@ def _assess_distribution_learning(model,
 
 def _evaluate_distribution_learning_benchmarks(model,
                                                benchmarks: List[DistributionLearningBenchmark],
-                                               return_gen=True) -> List[DistributionLearningBenchmarkResult]:
+                                               prior_gen=None) \
+                                               -> List[DistributionLearningBenchmarkResult]:
     """
     Evaluate a model with the given benchmarks.
     Should not be called directly except for testing purposes.
@@ -76,19 +113,17 @@ def _evaluate_distribution_learning_benchmarks(model,
 
     print(f'Number of benchmarks: {len(benchmarks)}')
 
-    results = []
-    prior_gen = []
-    for i, benchmark in enumerate(benchmarks, 1):
-        print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
-        if ('Validity' in benchmark.name or 'Unique' in benchmark.name or 'Novel' in benchmark.name) and return_gen == True:
-            result, prior_gen = benchmark.assess_model(model, prior_gen)
-        else:
-            result = benchmark.assess_model(model)
-        print(f'Results for the benchmark "{result.benchmark_name}":')
-        print(f'  Score: {result.score:.6f}')
-        print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
-        print(f'  Metadata: {result.metadata}')
-        results.append(result)
+    if version_name == 'v1':
+        for i, benchmark in enumerate(benchmarks, 1):
+            print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
+            result = benchmark.assess_model(model, prior_gen)
+            print(f'Results for the benchmark "{result.benchmark_name}":')
+            print(f'  Score: {result.score:.6f}')
+            print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
+            print(f'  Metadata: {result.metadata}')
+            results.append(result)
+    elif version_name == 'v2':
+
 
     logger.info('Finished execution of the benchmarks')
 

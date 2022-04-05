@@ -25,6 +25,7 @@ def goal_directed_benchmark_suite(version_name: str) -> List[GoalDirectedBenchma
 
 def distribution_learning_benchmark_suite(train_file_path: str,
                                           test_file_path: str,
+                                          test_scaffold_file_path: str,
                                           version_name: str,
                                           number_samples: int) -> List[DistributionLearningBenchmark]:
     """
@@ -42,7 +43,11 @@ def distribution_learning_benchmark_suite(train_file_path: str,
     # For distribution-learning, v1 and v2 are identical
     if version_name == 'v1' or version_name == 'v2':
         return distribution_learning_suite_v1(train_file_path=train_file_path,
+                                              number_samples=number_samples)
+    elif version_name == 'v2':
+        return distribution_learning_suite_v2(train_file_path=train_file_path,
                                               test_file_path=test_file_path,
+                                              test_scaffold_file_path=test_scaffold_file_path,
                                               number_samples=number_samples)
 
     raise Exception(f'Distribution-learning benchmark suite "{version_name}" does not exist.')
@@ -146,7 +151,7 @@ def goal_directed_suite_trivial() -> List[GoalDirectedBenchmark]:
     ]
 
 
-def distribution_learning_suite_v1(train_file_path: str, test_file_path: str, number_samples: int = 10000) -> \
+def distribution_learning_suite_v1(train_file_path: str, number_samples: int = 10000) -> \
         List[DistributionLearningBenchmark]:
     """
     Suite of distribution learning benchmarks, v1.
@@ -161,7 +166,23 @@ def distribution_learning_suite_v1(train_file_path: str, test_file_path: str, nu
     return [
         ValidityBenchmark(number_samples=number_samples),
         UniquenessBenchmark(number_samples=number_samples),
-        novelty_benchmark(training_set_file=train_file_path, number_samples=number_samples),
+        novelty_benchmark(training_set_file=train_file_path, number_samples=number_samples)
+    ]
+
+def distribution_learning_suite_v2(train_file_path: str, test_file_path: str, test_scaffold_file_path,
+                                   number_samples: int = 10000) -> List[DistributionLearningBenchmark]:
+    """
+    Suite of distribution learning benchmarks, v2.
+
+    Args:
+        train_file_path: path to the file with the reference molecules
+        test_file_path: path to the file with the test molecules
+        test_scaffold_path: path to the file with the heldout scaffolds
+
+    Returns:
+        List of benchmarks, version 2
+    """
+    return [
         kldiv_benchmark(training_set_file=train_file_path, number_samples=number_samples),
         frechet_benchmark(training_set_file=train_file_path, number_samples=number_samples),
         reconstruction_benchmark(test_set_file=test_file_path, number_samples=number_samples),
