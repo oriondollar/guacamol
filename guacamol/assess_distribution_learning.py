@@ -69,7 +69,7 @@ def _assess_distribution_learning(model,
                                      use_filters=use_filters)
         uniqueness = UniquenessBenchmark(number_samples=number_samples,
                                          use_filters=use_filters)
-        novelty = novelty_benchmark(train_file_path, number_samples, use_filters=use_filters)
+        novelty = novelty_benchmark(train_file, number_samples, use_filters=use_filters)
 
         print(f'Running benchmark: validity')
         result, valid = validity.assess_model(model)
