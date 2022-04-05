@@ -470,7 +470,7 @@ class SNNBenchmark(DistributionLearningBenchmark):
         super().__init__(name='SNN', number_samples=sample_size)
         self.test_fps = np.vstack(get_fingerprints_from_smileslist(test_set))
 
-    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model, prior_gen=[]) -> DistributionLearningBenchmarkResult:
         """
         Assess a distribution-matching generator model
 
@@ -478,7 +478,10 @@ class SNNBenchmark(DistributionLearningBenchmark):
             model: model to assess
         """
         start_time = time.time()
-        molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
+        if len(prior_gen) > 0:
+            molecules = prior_gen
+        else:
+            molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
         gen_fps = np.vstack(get_fingerprints_from_smileslist(molecules))
         end_time = time.time()
 
@@ -506,7 +509,7 @@ class IntDivBenchmark(DistributionLearningBenchmark):
         super().__init__(name='IntDiv', number_samples=number_samples)
         self.p = p
 
-    def assess_model(self, model) -> DistributionLearningBenchmarkResult:
+    def assess_model(self, model, prior_gen=[]) -> DistributionLearningBenchmarkResult:
         """
         Assess a distribution-matching generator model
 
@@ -514,7 +517,10 @@ class IntDivBenchmark(DistributionLearningBenchmark):
             model: model to assess
         """
         start_time = time.time()
-        molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
+        if len(prior_gen) > 0:
+            molecules = prior_gen
+        else:
+            molecules = sample_valid_molecules(model=model, number_molecules=self.number_samples)
         gen_fps = np.vstack(get_fingerprints_from_smileslist(molecules))
         end_time = time.time()
 

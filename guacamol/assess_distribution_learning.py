@@ -71,13 +71,31 @@ def _assess_distribution_learning(model,
                                          use_filters=use_filters)
         novelty = novelty_benchmark(train_file_path, number_samples, use_filters=use_filters)
 
+        print(f'Running benchmark: validity')
         result, valid = validity.assess_model(model)
         results.append(result)
+        print(f'Results for the benchmark validity:')
+        print(f'  Score: {result.score:.6f}')
+        print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
+        print(f'  Metadata: {result.metadata}')
+
+        print(f'Running benchmark: uniqueness')
         result, unique = uniqueness.assess_model(model, valid)
         results.append(result)
+        print(f'Results for the benchmark uniqueness:')
+        print(f'  Score: {result.score:.6f}')
+        print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
+        print(f'  Metadata: {result.metadata}')
+
+        print(f'Running benchmark: novelty')
         result, novel = novelty.assess_model(model, unique)
         results.append(result)
+        print(f'Results for the benchmark novelty:')
+        print(f'  Score: {result.score:.6f}')
+        print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
+        print(f'  Metadata: {result.metadata}')
         if len(novel) < number_samples:
+            print(f'Upsampling to specified number of novel molecules')
             novel = sample_novel_molecules(model, number_molecules=number_samples,
                                            train_file=train_file_path, prior_gen=novel,
                                            use_filters=use_filters)
@@ -113,17 +131,14 @@ def _evaluate_distribution_learning_benchmarks(model,
 
     print(f'Number of benchmarks: {len(benchmarks)}')
 
-    if version_name == 'v1':
-        for i, benchmark in enumerate(benchmarks, 1):
-            print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
-            result = benchmark.assess_model(model, prior_gen)
-            print(f'Results for the benchmark "{result.benchmark_name}":')
-            print(f'  Score: {result.score:.6f}')
-            print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
-            print(f'  Metadata: {result.metadata}')
-            results.append(result)
-    elif version_name == 'v2':
-
+    for i, benchmark in enumerate(benchmarks, 1):
+        print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
+        result = benchmark.assess_model(model, prior_gen)
+        print(f'Results for the benchmark "{result.benchmark_name}":')
+        print(f'  Score: {result.score:.6f}')
+        print(f'  Sampling time: {str(datetime.timedelta(seconds=int(result.sampling_time)))}')
+        print(f'  Metadata: {result.metadata}')
+        results.append(result)
 
     logger.info('Finished execution of the benchmarks')
 
