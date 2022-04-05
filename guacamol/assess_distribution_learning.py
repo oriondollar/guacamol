@@ -61,9 +61,9 @@ def _assess_distribution_learning(model,
                                                        version_name=benchmark_version,
                                                        number_samples=number_samples)
 
-    if version_name == 'v1':
+    if benchmark_version == 'v1':
         results = _evaluate_distribution_learning_benchmarks(model=model, benchmarks=benchmarks)
-    elif version_name == 'v2':
+    elif benchmark_version == 'v2':
         results = []
         validity = ValidityBenchmark(number_samples=number_samples,
                                      use_filters=use_filters)
