@@ -26,6 +26,7 @@ def goal_directed_benchmark_suite(version_name: str) -> List[GoalDirectedBenchma
 def distribution_learning_benchmark_suite(train_file_path: str,
                                           test_file_path: str,
                                           test_scaffold_file_path: str,
+                                          reconstruct: bool,
                                           version_name: str,
                                           number_samples: int) -> List[DistributionLearningBenchmark]:
     """
@@ -48,6 +49,7 @@ def distribution_learning_benchmark_suite(train_file_path: str,
         return distribution_learning_suite_v2(train_file_path=train_file_path,
                                               test_file_path=test_file_path,
                                               test_scaffold_file_path=test_scaffold_file_path,
+                                              reconstruct=reconstruct,
                                               number_samples=number_samples)
 
     raise Exception(f'Distribution-learning benchmark suite "{version_name}" does not exist.')
