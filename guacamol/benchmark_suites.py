@@ -169,8 +169,8 @@ def distribution_learning_suite_v1(train_file_path: str, number_samples: int = 1
         novelty_benchmark(training_set_file=train_file_path, number_samples=number_samples)
     ]
 
-def distribution_learning_suite_v2(train_file_path: str, test_file_path: str, test_scaffold_file_path,
-                                   number_samples: int = 10000) -> List[DistributionLearningBenchmark]:
+def distribution_learning_suite_v2(train_file_path: str, test_file_path: str, test_scaffold_file_path: str,
+                                   reconstruct: bool, number_samples: int = 10000) -> List[DistributionLearningBenchmark]:
     """
     Suite of distribution learning benchmarks, v2.
 
@@ -182,15 +182,20 @@ def distribution_learning_suite_v2(train_file_path: str, test_file_path: str, te
     Returns:
         List of benchmarks, version 2
     """
-    return [
+    benchmarks = [
         kldiv_benchmark(training_set_file=train_file_path, number_samples=number_samples),
         frechet_benchmark(training_set_file=train_file_path, number_samples=number_samples),
-        reconstruction_benchmark(test_set_file=test_file_path, number_samples=number_samples),
         frag_benchmark(test_set_file=test_file_path, number_samples=number_samples, type='test'),
-        frag_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'),
         scaf_benchmark(test_set_file=test_file_path, number_samples=number_samples, type='test'),
-        scaf_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'),
         snn_benchmark(test_set_file=test_file_path, number_samples=number_samples),
         IntDivBenchmark(number_samples=number_samples, p=1),
         IntDivBenchmark(number_samples=number_samples, p=2)
     ]
+
+    if test_scaffold_file_path is not None:
+        benchmarks.append(frag_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'))
+        benchmarks.append(scaf_benchmark(test_set_file=test_scaffold_file_path, number_samples=number_samples, type='test_scaffold'))
+    if reconstruct:
+        benchmarks.append(reconstruction_benchmark(test_set_file=test_file_path, number_samples=number_samples))
+
+    return benchmarks

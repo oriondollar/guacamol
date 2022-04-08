@@ -264,10 +264,11 @@ def median_camphor_menthol(mean_cls=GeometricMeanScoringFunction) -> GoalDirecte
 
 
 def novelty_benchmark(training_set_file: str, number_samples: int,
-                      return_novel=True, use_filters=False) -> DistributionLearningBenchmark:
+                      return_novel=True, use_filters=False, return_train_mols=False) -> DistributionLearningBenchmark:
     smiles_list = [s.strip() for s in open(training_set_file).readlines()]
     return NoveltyBenchmark(number_samples=number_samples, training_set=smiles_list,
-                            return_novel=return_novel, use_filters=use_filters)
+                            return_novel=return_novel, use_filters=use_filters,
+                            return_train_mols=return_train_mols)
 
 def kldiv_benchmark(training_set_file: str, number_samples: int) -> DistributionLearningBenchmark:
     smiles_list = [s.strip() for s in open(training_set_file).readlines()]

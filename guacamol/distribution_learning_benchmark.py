@@ -143,7 +143,7 @@ class UniquenessBenchmark(DistributionLearningBenchmark):
 
 class NoveltyBenchmark(DistributionLearningBenchmark):
     def __init__(self, number_samples: int, training_set: Iterable[str], return_novel=True,
-                 use_filters=False) -> None:
+                 use_filters=False, return_train_mols=False) -> None:
         """
         Args:
             number_samples: number of samples to generate from the model
@@ -153,6 +153,7 @@ class NoveltyBenchmark(DistributionLearningBenchmark):
         self.training_set_molecules = set(canonicalize_list(training_set, include_stereocenters=False))
         self.return_novel = return_novel
         self.use_filters = use_filters
+        self.return_train_mols = return_train_mols
 
     def assess_model(self, model, prior_gen=[]):
         """
@@ -186,8 +187,12 @@ class NoveltyBenchmark(DistributionLearningBenchmark):
                                                       score=novel_ratio,
                                                       sampling_time=end_time - start_time,
                                                       metadata=metadata)
-        if self.return_novel:
+        if self.return_novel and self.return_train_mols:
+            return result, novel_molecules, list(self.training_set_molecules)
+        elif self.return_novel:
             return result, novel_molecules
+        elif self.return_train_mols:
+            return result, list(self.training_set_molecules)
         else:
             return result
 

@@ -20,6 +20,7 @@ def assess_distribution_learning(model,
                                  train_file: str,
                                  test_file=None,
                                  test_scaffold_file=None,
+                                 reconstruct=False,
                                  use_filters=False,
                                  json_output_file='output_distribution_learning.json',
                                  benchmark_version='v2') -> None:
@@ -36,6 +37,7 @@ def assess_distribution_learning(model,
                                   train_file=train_file,
                                   test_file=test_file,
                                   test_scaffold_file=test_scaffold_file,
+                                  reconstruct=reconstruct,
                                   use_filters=use_filters,
                                   json_output_file=json_output_file,
                                   benchmark_version=benchmark_version,
@@ -46,6 +48,7 @@ def _assess_distribution_learning(model,
                                   train_file: str,
                                   test_file: str,
                                   test_scaffold_file: str,
+                                  reconstruct: bool,
                                   use_filters: bool,
                                   json_output_file: str,
                                   benchmark_version: str,
@@ -58,6 +61,7 @@ def _assess_distribution_learning(model,
     benchmarks = distribution_learning_benchmark_suite(train_file_path=train_file,
                                                        test_file_path=test_file,
                                                        test_scaffold_file_path=test_scaffold_file,
+                                                       reconstruct=reconstruct,
                                                        version_name=benchmark_version,
                                                        number_samples=number_samples)
 
@@ -69,7 +73,8 @@ def _assess_distribution_learning(model,
                                      use_filters=use_filters)
         uniqueness = UniquenessBenchmark(number_samples=number_samples,
                                          use_filters=use_filters)
-        novelty = novelty_benchmark(train_file, number_samples, use_filters=use_filters)
+        novelty = novelty_benchmark(train_file, number_samples, use_filters=use_filters,
+                                    return_train_mols=True)
 
         print(f'Running benchmark: validity')
         result, valid = validity.assess_model(model)
@@ -88,7 +93,7 @@ def _assess_distribution_learning(model,
         print(f'  Metadata: {result.metadata}')
 
         print(f'Running benchmark: novelty')
-        result, novel = novelty.assess_model(model, unique)
+        result, novel, train_mols = novelty.assess_model(model, unique)
         results.append(result)
         print(f'Results for the benchmark novelty:')
         print(f'  Score: {result.score:.6f}')
@@ -97,7 +102,7 @@ def _assess_distribution_learning(model,
         if len(novel) < number_samples:
             print(f'Upsampling to specified number of novel molecules')
             novel = sample_novel_molecules(model, number_molecules=number_samples,
-                                           train_file=train_file, prior_gen=novel,
+                                           train_mols=train_mols, prior_gen=novel,
                                            use_filters=use_filters)
         results += _evaluate_distribution_learning_benchmarks(model=model, benchmarks=benchmarks,
                                                               prior_gen=novel)
@@ -117,8 +122,7 @@ def _assess_distribution_learning(model,
 
 def _evaluate_distribution_learning_benchmarks(model,
                                                benchmarks: List[DistributionLearningBenchmark],
-                                               prior_gen=None) \
-                                               -> List[DistributionLearningBenchmarkResult]:
+                                               prior_gen=None) -> List[DistributionLearningBenchmarkResult]:
     """
     Evaluate a model with the given benchmarks.
     Should not be called directly except for testing purposes.
