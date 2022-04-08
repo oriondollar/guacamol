@@ -143,14 +143,17 @@ class UniquenessBenchmark(DistributionLearningBenchmark):
 
 class NoveltyBenchmark(DistributionLearningBenchmark):
     def __init__(self, number_samples: int, training_set: Iterable[str], return_novel=True,
-                 use_filters=False, return_train_mols=False) -> None:
+                 use_filters=False, return_train_mols=False, canonicalize=False) -> None:
         """
         Args:
             number_samples: number of samples to generate from the model
             training_set: molecules from the training set
         """
         super().__init__(name='Novelty', number_samples=number_samples)
-        self.training_set_molecules = set(canonicalize_list(training_set, include_stereocenters=False))
+        if canonicalize:
+            self.training_set_molecules = set(canonicalize_list(training_set, include_stereocenters=False))
+        else:
+            self.training_set_molecules = set(training_set)
         self.return_novel = return_novel
         self.use_filters = use_filters
         self.return_train_mols = return_train_mols
