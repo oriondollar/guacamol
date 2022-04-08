@@ -205,15 +205,19 @@ class KLDivBenchmark(DistributionLearningBenchmark):
     Computes the KL divergence between a number of samples and the training set for physchem descriptors
     """
 
-    def __init__(self, number_samples: int, training_set: List[str], use_filters=False) -> None:
+    def __init__(self, number_samples: int, training_set: List[str], use_filters=False,
+                 canonicalize=False) -> None:
         """
         Args:
             number_samples: number of samples to generate from the model
             training_set: molecules from the training set
         """
         super().__init__(name='KL divergence', number_samples=number_samples)
-        self.training_set_molecules = canonicalize_list(get_random_subset(training_set, self.number_samples, seed=42),
-                                                        include_stereocenters=False)
+        if canonicalize:
+            self.training_set_molecules = canonicalize_list(get_random_subset(training_set, self.number_samples, seed=42),
+                                                            include_stereocenters=False)
+        else:
+            self.training_set_molecules = get_random_subset(training_set, self.number_samples, seed=42)
         self.pc_descriptor_subset = [
             'BertzCT',
             'MolLogP',
@@ -302,15 +306,19 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
     """
     Computes the reconstruction accuracy for a set of holdout molecules
     """
-    def __init__(self, test_set: List[str], sample_size: int, use_filters=False) -> None:
+    def __init__(self, test_set: List[str], sample_size: int, use_filters=False,
+                 canonicalize=False) -> None:
         """
         Args:
             test_set: list of smiles to reconstruct
             sample_size: number of smiles to reconstruct
         """
         super().__init__(name='Reconstruction', number_samples=sample_size)
-        self.test_set_molecules = canonicalize_list(get_random_subset(test_set, self.number_samples, seed=42),
-                                                    include_stereocenters=False)
+        if canonicalize:
+            self.test_set_molecules = canonicalize_list(get_random_subset(test_set, self.number_samples, seed=42),
+                                                        include_stereocenters=False)
+        else:
+            self.test_set_molecules = get_random_subset(test_set, self.number_samples, seed=42)
         self.test_set_tokenized = [tokenizer(smi) for smi in self.test_set_molecules]
         self.use_filters = use_filters
 
