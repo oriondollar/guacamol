@@ -72,12 +72,15 @@ def pass_through_filters(smiles, filters_dir='filters'):
     filtered_smiles = []
     for smi in smiles:
         mol = Chem.MolFromSmiles(smi)
-        h_mol = Chem.AddHs(mol)
-        filtered = False
-        if any(h_mol.HasSubstructMatch(smarts) for smarts in _filters):
-            filtered = True
-        if not filtered:
-            filtered_smiles.append(smi)
+        if mol is None:
+            pass
+        else:
+            h_mol = Chem.AddHs(mol)
+            filtered = False
+            if any(h_mol.HasSubstructMatch(smarts) for smarts in _filters):
+                filtered = True
+            if not filtered:
+                filtered_smiles.append(smi)
     return filtered_smiles
 
 def is_valid(smiles: str):
