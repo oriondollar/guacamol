@@ -73,6 +73,7 @@ def sample_unique_molecules(model, number_molecules: int, prior_gen=[],
                 canonical_smiles = canonicalize(smiles)
                 if canonical_smiles is not None and canonical_smiles not in unique_set:
                     unique_list.append(canonical_smiles)
+                    unique_set.add(canonical_smiles)
 
         if use_filters:
             unique_list = pass_through_filters(unique_list)
