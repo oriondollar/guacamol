@@ -75,7 +75,7 @@ class ValidityBenchmark(DistributionLearningBenchmark):
         end_time = time.time()
 
         if len(molecules) != self.number_samples:
-            raise Exception('The model did not generate the correct number of molecules')
+            raise Exception('The model did not generate the correct number of molecules, {} / {}'.format(len(molecules), self.number_samples))
 
         valid = []
         for smi in molecules:
