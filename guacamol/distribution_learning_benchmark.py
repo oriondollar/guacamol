@@ -331,6 +331,7 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
         """
         start_time = time.time()
         reconstructed_smiles = model.reconstruct(self.test_set_molecules)
+        reconstructed_smiles = canonicalize_list(reconstructed_smiles, include_stereocenters=False)
         end_time = time.time()
         reconstructed_tokenized = [tokenizer(smi) for smi in reconstructed_smiles]
         smile_accs = []
