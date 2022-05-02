@@ -23,7 +23,8 @@ def assess_distribution_learning(model,
                                  reconstruct=False,
                                  use_filters=False,
                                  json_output_file='output_distribution_learning.json',
-                                 benchmark_version='v2') -> None:
+                                 benchmark_version='v2',
+                                 number_samples=10000) -> None:
     """
     Assesses a distribution-matching model for de novo molecule design.
 
@@ -41,7 +42,7 @@ def assess_distribution_learning(model,
                                   use_filters=use_filters,
                                   json_output_file=json_output_file,
                                   benchmark_version=benchmark_version,
-                                  number_samples=10000)
+                                  number_samples=number_samples)
 
 
 def _assess_distribution_learning(model,
