@@ -25,6 +25,7 @@ def sample_valid_molecules(model, number_molecules: int, prior_gen=[],
 
     while len(valid_molecules) < number_molecules and number_already_sampled < max_samples:
         remaining_to_sample = number_molecules - len(valid_molecules)
+        remaining_to_sample = max(100, remaining_to_sample)
 
         samples = model.generate(remaining_to_sample)
         number_already_sampled += remaining_to_sample
@@ -33,7 +34,7 @@ def sample_valid_molecules(model, number_molecules: int, prior_gen=[],
         if use_filters:
             valid_molecules = pass_through_filters(valid_molecules)
 
-    return valid_molecules
+    return valid_molecules[:number_molecules]
 
 
 def sample_unique_molecules(model, number_molecules: int, prior_gen=[],
@@ -64,6 +65,7 @@ def sample_unique_molecules(model, number_molecules: int, prior_gen=[],
 
     while len(unique_list) < number_molecules and number_already_sampled < max_samples:
         remaining_to_sample = number_molecules - len(unique_list)
+        remaining_to_sample = max(100, remaining_to_sample)
 
         samples = model.generate(remaining_to_sample)
         number_already_sampled += remaining_to_sample
@@ -79,7 +81,7 @@ def sample_unique_molecules(model, number_molecules: int, prior_gen=[],
             unique_list = pass_through_filters(unique_list)
         unique_set = set(unique_list)
 
-    return unique_list
+    return unique_list[:number_molecules]
 
 def sample_novel_molecules(model, number_molecules: int, train_mols: Union[str, List[str]],
                            prior_gen=[], use_filters=False, max_tries=10) -> List[str]:
@@ -118,6 +120,7 @@ def sample_novel_molecules(model, number_molecules: int, train_mols: Union[str, 
 
     while len(unique_list) < number_molecules and number_already_sampled < max_samples:
         remaining_to_sample = number_molecules - len(novel_list)
+        remaining_to_sample = max(100, remaining_to_sample)
 
         samples = model.generate(remaining_to_sample)
         number_already_sampled += remaining_to_sample
@@ -135,4 +138,4 @@ def sample_novel_molecules(model, number_molecules: int, train_mols: Union[str, 
         novel_set = unique_set.difference(train_molecules)
         novel_list = list(novel_set)
 
-    return novel_list
+    return novel_list[:number_molecules]
