@@ -2,6 +2,7 @@ from typing import List, Set, Iterable, Union
 
 from guacamol.utils.chemistry import is_valid, canonicalize, canonicalize_list, pass_through_filters
 
+MIN_GEN = 1000
 
 def sample_valid_molecules(model, number_molecules: int, prior_gen=[],
                            use_filters=False, max_tries=10) -> List[str]:
@@ -25,7 +26,7 @@ def sample_valid_molecules(model, number_molecules: int, prior_gen=[],
 
     while len(valid_molecules) < number_molecules and number_already_sampled < max_samples:
         remaining_to_sample = number_molecules - len(valid_molecules)
-        remaining_to_sample = max(100, remaining_to_sample)
+        remaining_to_sample = max(MIN_GEN, remaining_to_sample)
 
         samples = model.generate(remaining_to_sample)
         number_already_sampled += remaining_to_sample
@@ -65,7 +66,7 @@ def sample_unique_molecules(model, number_molecules: int, prior_gen=[],
 
     while len(unique_list) < number_molecules and number_already_sampled < max_samples:
         remaining_to_sample = number_molecules - len(unique_list)
-        remaining_to_sample = max(100, remaining_to_sample)
+        remaining_to_sample = max(MIN_GEN, remaining_to_sample)
 
         samples = model.generate(remaining_to_sample)
         number_already_sampled += remaining_to_sample
@@ -120,7 +121,7 @@ def sample_novel_molecules(model, number_molecules: int, train_mols: Union[str, 
 
     while len(unique_list) < number_molecules and number_already_sampled < max_samples:
         remaining_to_sample = number_molecules - len(novel_list)
-        remaining_to_sample = max(100, remaining_to_sample)
+        remaining_to_sample = max(MIN_GEN, remaining_to_sample)
 
         samples = model.generate(remaining_to_sample)
         number_already_sampled += remaining_to_sample
