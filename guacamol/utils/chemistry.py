@@ -144,6 +144,8 @@ def fragment_list(smiles_list: Iterable[str]) -> Counter:
     fragments = Counter()
     mols = [Chem.MolFromSmiles(smi) for smi in smiles_list]
     for mol in mols:
+        if mol is None:
+            continue
         fgs = AllChem.FragmentOnBRICSBonds(mol)
         fgs_smi = Chem.MolToSmiles(fgs).split(".")
         fragments.update(fgs_smi)
@@ -153,6 +155,8 @@ def scaffold_list(smiles_list: Iterable[str], min_rings=2) -> Counter:
     scaffolds = Counter()
     mols = [Chem.MolFromSmiles(smi) for smi in smiles_list]
     for mol in mols:
+        if mol is None:
+            continue
         try:
             scaffold = MurckoScaffold.GetScaffoldForMol(mol)
             n_rings = scaffold.GetRingInfo().NumRings()
