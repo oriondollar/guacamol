@@ -23,9 +23,9 @@ def goal_directed_benchmark_suite(version_name: str) -> List[GoalDirectedBenchma
     raise Exception(f'Goal-directed benchmark suite "{version_name}" does not exist.')
 
 
-def distribution_learning_benchmark_suite(train_mols: Set[str],
-                                          test_mols: Set[str],
-                                          test_scaffold_mols: Set[str],
+def distribution_learning_benchmark_suite(train_mols: List[str],
+                                          test_mols: List[str],
+                                          test_scaffold_mols: List[str],
                                           reconstruct: bool,
                                           version_name: str,
                                           number_samples: int) -> List[DistributionLearningBenchmark]:
@@ -171,7 +171,7 @@ def distribution_learning_suite_v1(train_file_path: str, number_samples: int = 1
         novelty_benchmark(training_set_file=train_file_path, number_samples=number_samples)
     ]
 
-def distribution_learning_suite_v2(train_mols: Set[str], test_mols: Set[str], test_scaffold_mols: Set[str],
+def distribution_learning_suite_v2(train_mols: List[str], test_mols: List[str], test_scaffold_mols: List[str],
                                    reconstruct: bool, number_samples: int = 10000) -> List[DistributionLearningBenchmark]:
     """
     Suite of distribution learning benchmarks, v2.

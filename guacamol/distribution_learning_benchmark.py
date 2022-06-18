@@ -150,7 +150,7 @@ class NoveltyBenchmark(DistributionLearningBenchmark):
             training_set: molecules from the training set
         """
         super().__init__(name='Novelty', number_samples=number_samples)
-        self.training_set_molecules = training_set
+        self.training_set_molecules = set(training_set)
         self.return_novel = return_novel
         self.use_filters = use_filters
         self.return_train_mols = return_train_mols
@@ -202,7 +202,7 @@ class KLDivBenchmark(DistributionLearningBenchmark):
     Computes the KL divergence between a number of samples and the training set for physchem descriptors
     """
 
-    def __init__(self, number_samples: int, training_set: Set[str], use_filters=False) -> None:
+    def __init__(self, number_samples: int, training_set: List[str], use_filters=False) -> None:
         """
         Args:
             number_samples: number of samples to generate from the model
@@ -298,7 +298,7 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
     """
     Computes the reconstruction accuracy for a set of holdout molecules
     """
-    def __init__(self, test_set: Set[str], sample_size: int, use_filters=False,
+    def __init__(self, test_set: List[str], sample_size: int, use_filters=False,
                  canonicalize=False) -> None:
         """
         Args:
@@ -307,8 +307,7 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
         """
         super().__init__(name='Reconstruction', number_samples=sample_size)
         if canonicalize:
-            self.test_set_molecules = canonicalize_list(get_random_subset(test_set, self.number_samples, seed=42),
-                                                        include_stereocenters=False)
+            self.test_set_molecules = canonicalize_list(get_random_subset(test_set, self.number_samples, seed=42))
         else:
             self.test_set_molecules = get_random_subset(test_set, self.number_samples, seed=42)
         self.test_set_tokenized = [tokenizer(smi) for smi in self.test_set_molecules]
@@ -323,7 +322,7 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
         """
         start_time = time.time()
         reconstructed_smiles = model.reconstruct(self.test_set_molecules)
-        reconstructed_smiles = canonicalize_list(reconstructed_smiles, include_stereocenters=False)
+        reconstructed_smiles = canonicalize_list(reconstructed_smiles)
         end_time = time.time()
         reconstructed_tokenized = [tokenizer(smi) for smi in reconstructed_smiles]
         smile_accs = []
@@ -368,7 +367,7 @@ class FragBenchmark(DistributionLearningBenchmark):
     """
     Computes the cosine similarity between generated fragments and holdout set fragments
     """
-    def __init__(self, test_set: Set[str], sample_size: int, type: str, use_filters=False) -> None:
+    def __init__(self, test_set: List[str], sample_size: int, type: str, use_filters=False) -> None:
         """
         Args:
             test_set: list of smiles to use for fragment comparison
@@ -411,7 +410,7 @@ class ScafBenchmark(DistributionLearningBenchmark):
     """
     Computes the cosine similarity between generated scaffolds and holdout set scaffolds
     """
-    def __init__(self, test_set: Set[str], sample_size: int, type: str, use_filters=False) -> None:
+    def __init__(self, test_set: List[str], sample_size: int, type: str, use_filters=False) -> None:
         """
         Args:
             test_set: list of smiles to use for scaffold comparison

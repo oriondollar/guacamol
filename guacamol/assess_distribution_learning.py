@@ -18,8 +18,8 @@ logger.addHandler(logging.NullHandler())
 
 
 def assess_distribution_learning(model,
-                                 train_mols: Union[str, Set[str]],
-                                 test_mols: Union[str, Set[str]],
+                                 train_mols: Union[str, List[str]],
+                                 test_mols: Union[str, List[str]],
                                  test_scaffold_file=None,
                                  reconstruct=False,
                                  use_filters=False,
@@ -47,8 +47,8 @@ def assess_distribution_learning(model,
 
 
 def _assess_distribution_learning(model,
-                                  train_mols: Union[str, Set[str]],
-                                  test_mols: Union[str, Set[str]],
+                                  train_mols: Union[str, List[str]],
+                                  test_mols: Union[str, List[str]],
                                   test_scaffold_file: str,
                                   reconstruct: bool,
                                   use_filters: bool,
@@ -62,13 +62,11 @@ def _assess_distribution_learning(model,
     logger.info(f'Benchmarking distribution learning, version {benchmark_version}')
     if isinstance(train_mols, str):
         train_mols = [s.strip() for s in open(train_mols).readlines()]
-        train_mols = set(canonicalize_list(train_mols))
+        train_mols = canonicalize_list(train_mols)
     if isinstance(test_mols, str):
         test_mols = [s.strip() for s in open(test_mols).readlines()]
-        test_mols = set(test_mols)
     if test_scaffold_file is not None:
         test_scaffold_mols = [s.strip() for s in open(test_scaffold_mols).readlines()]
-        test_scaffold_mols = set(test_scaffold_mols)
     else:
         test_scaffold_mols = None
     benchmarks = distribution_learning_benchmark_suite(train_mols=train_mols,
