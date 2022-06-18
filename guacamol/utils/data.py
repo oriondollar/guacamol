@@ -56,7 +56,10 @@ def get_random_subset(dataset: List[Any], subset_size: int, seed: Optional[int] 
         # extract a subset (for a given training set, the subset will always be identical).
         np.random.seed(seed)
 
-    subset = np.random.choice(dataset, subset_size, replace=False)
+    subset_idxs = np.random.choice(np.arange(len(dataset)), subset_size, replace=False)
+    subset = []
+    for idx in subset_idxs:
+        subset.append(dataset[idx])
 
     if seed is not None:
         # reset random number generator state, only if needed
