@@ -48,7 +48,7 @@ def assess_distribution_learning(model,
 
 def _assess_distribution_learning(model,
                                   train_mols: Union[str, Set[str]],
-                                  test_file: Union[str, Set[str]],
+                                  test_mols: Union[str, Set[str]],
                                   test_scaffold_file: str,
                                   reconstruct: bool,
                                   use_filters: bool,
