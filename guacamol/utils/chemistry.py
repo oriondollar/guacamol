@@ -99,7 +99,7 @@ def is_valid(smiles: str):
     return smiles != '' and mol is not None and mol.GetNumAtoms() > 0
 
 
-def canonicalize(smiles: str, include_stereocenters=True) -> Optional[str]:
+def canonicalize(smiles: str) -> Optional[str]:
     """
     Canonicalize the SMILES strings with RDKit.
 
@@ -116,12 +116,12 @@ def canonicalize(smiles: str, include_stereocenters=True) -> Optional[str]:
     mol = Chem.MolFromSmiles(smiles)
 
     if mol is not None:
-        return Chem.MolToSmiles(mol, isomericSmiles=include_stereocenters)
+        return Chem.MolToSmiles(mol)
     else:
         return None
 
 
-def canonicalize_list(smiles_list: Iterable[str], include_stereocenters=True) -> List[str]:
+def canonicalize_list(smiles_list: Iterable[str]) -> List[str]:
     """
     Canonicalize a list of smiles. Filters out repetitions and removes corrupted molecules.
 
@@ -133,7 +133,7 @@ def canonicalize_list(smiles_list: Iterable[str], include_stereocenters=True) ->
         The canonicalized and filtered input smiles.
     """
 
-    canonicalized_smiles = [canonicalize(smiles, include_stereocenters) for smiles in smiles_list]
+    canonicalized_smiles = [canonicalize(smiles) for smiles in smiles_list]
 
     # Remove None elements
     canonicalized_smiles = [s for s in canonicalized_smiles if s is not None]

@@ -2,13 +2,14 @@ import datetime
 import json
 import logging
 from collections import OrderedDict
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union, Set
 
 import guacamol
 from guacamol.distribution_learning_benchmark import DistributionLearningBenchmark, DistributionLearningBenchmarkResult, \
     ValidityBenchmark, UniquenessBenchmark
 from guacamol.standard_benchmarks import novelty_benchmark
 from guacamol.utils.sampling_helpers import sample_novel_molecules
+from guacamol.utils.chemistry import canonicalize_list
 from guacamol.benchmark_suites import distribution_learning_benchmark_suite
 from guacamol.utils.data import get_time_string
 
@@ -17,8 +18,8 @@ logger.addHandler(logging.NullHandler())
 
 
 def assess_distribution_learning(model,
-                                 train_file: str,
-                                 test_file=None,
+                                 train_mols: Union[str, Set[str]],
+                                 test_mols: Union[str, Set[str]],
                                  test_scaffold_file=None,
                                  reconstruct=False,
                                  use_filters=False,
@@ -35,8 +36,8 @@ def assess_distribution_learning(model,
         benchmark_version: which benchmark suite to execute
     """
     _assess_distribution_learning(model=model,
-                                  train_file=train_file,
-                                  test_file=test_file,
+                                  train_mols=train_mols,
+                                  test_mols=test_mols,
                                   test_scaffold_file=test_scaffold_file,
                                   reconstruct=reconstruct,
                                   use_filters=use_filters,
@@ -46,8 +47,8 @@ def assess_distribution_learning(model,
 
 
 def _assess_distribution_learning(model,
-                                  train_file: str,
-                                  test_file: str,
+                                  train_mols: Union[str, Set[str]],
+                                  test_file: Union[str, Set[str]],
                                   test_scaffold_file: str,
                                   reconstruct: bool,
                                   use_filters: bool,
@@ -59,9 +60,20 @@ def _assess_distribution_learning(model,
     To call directly only for testing.
     """
     logger.info(f'Benchmarking distribution learning, version {benchmark_version}')
-    benchmarks = distribution_learning_benchmark_suite(train_file_path=train_file,
-                                                       test_file_path=test_file,
-                                                       test_scaffold_file_path=test_scaffold_file,
+    if isinstance(train_mols, str):
+        train_mols = [s.strip() for s in open(train_mols).readlines()]
+        train_mols = set(canonicalize_list(train_mols))
+    if isinstance(test_mols, str):
+        test_mols = [s.strip() for s in open(test_mols).readlines()]
+        test_mols = set(test_mols)
+    if test_scaffold_file is not None:
+        test_scaffold_mols = [s.strip() for s in open(test_scaffold_mols).readlines()]
+        test_scaffold_mols = set(test_scaffold_mols)
+    else:
+        test_scaffold_mols = None
+    benchmarks = distribution_learning_benchmark_suite(train_mols=train_mols,
+                                                       test_mols=test_mols,
+                                                       test_scaffold_mols=test_scaffold_mols,
                                                        reconstruct=reconstruct,
                                                        version_name=benchmark_version,
                                                        number_samples=number_samples)
@@ -74,7 +86,7 @@ def _assess_distribution_learning(model,
                                      use_filters=use_filters)
         uniqueness = UniquenessBenchmark(number_samples=number_samples,
                                          use_filters=use_filters)
-        novelty = novelty_benchmark(train_file, number_samples, use_filters=use_filters,
+        novelty = novelty_benchmark(train_mols, number_samples, use_filters=use_filters,
                                     return_train_mols=True)
 
         print(f'Running benchmark: validity')

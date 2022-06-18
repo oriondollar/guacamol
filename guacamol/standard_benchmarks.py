@@ -1,4 +1,5 @@
 from rdkit import Chem
+from typing import Set
 
 from guacamol.common_scoring_functions import TanimotoScoringFunction, RdkitScoringFunction, CNS_MPO_ScoringFunction, \
     IsomerScoringFunction, SMARTSScoringFunction
@@ -263,36 +264,30 @@ def median_camphor_menthol(mean_cls=GeometricMeanScoringFunction) -> GoalDirecte
                                  contribution_specification=specification)
 
 
-def novelty_benchmark(training_set_file: str, number_samples: int,
+def novelty_benchmark(train_mols: Set[str], number_samples: int,
                       return_novel=True, use_filters=False, return_train_mols=False) -> DistributionLearningBenchmark:
-    smiles_list = [s.strip() for s in open(training_set_file).readlines()]
-    return NoveltyBenchmark(number_samples=number_samples, training_set=smiles_list,
+    return NoveltyBenchmark(number_samples=number_samples, training_set=train_mols,
                             return_novel=return_novel, use_filters=use_filters,
                             return_train_mols=return_train_mols)
 
-def kldiv_benchmark(training_set_file: str, number_samples: int) -> DistributionLearningBenchmark:
-    smiles_list = [s.strip() for s in open(training_set_file).readlines()]
-    return KLDivBenchmark(number_samples=number_samples, training_set=smiles_list)
+def kldiv_benchmark(train_mols: Set[str], number_samples: int) -> DistributionLearningBenchmark:
+    return KLDivBenchmark(number_samples=number_samples, training_set=train_mols)
 
 def frechet_benchmark(training_set_file: str, number_samples: int) -> DistributionLearningBenchmark:
     smiles_list = [s.strip() for s in open(training_set_file).readlines()]
     return FrechetBenchmark(training_set=smiles_list, sample_size=number_samples)
 
-def reconstruction_benchmark(test_set_file: str, number_samples: int) -> DistributionLearningBenchmark:
-    smiles_list = [s.strip() for s in open(test_set_file).readlines()]
-    return ReconstructionBenchmark(test_set=smiles_list, sample_size=number_samples)
+def reconstruction_benchmark(test_mols: Set[str], number_samples: int) -> DistributionLearningBenchmark:
+    return ReconstructionBenchmark(test_set=test_mols, sample_size=number_samples)
 
-def frag_benchmark(test_set_file: str, number_samples: int, type: str) -> DistributionLearningBenchmark:
-    smiles_list = [s.strip() for s in open(test_set_file).readlines()]
-    return FragBenchmark(test_set=smiles_list, sample_size=number_samples, type=type)
+def frag_benchmark(test_mols: Set[str], number_samples: int, type: str) -> DistributionLearningBenchmark:
+    return FragBenchmark(test_set=test_mols, sample_size=number_samples, type=type)
 
-def scaf_benchmark(test_set_file: str, number_samples: int, type: str) -> DistributionLearningBenchmark:
-    smiles_list = [s.strip() for s in open(test_set_file).readlines()]
-    return ScafBenchmark(test_set=smiles_list, sample_size=number_samples, type=type)
+def scaf_benchmark(test_mols: Set[str], number_samples: int, type: str) -> DistributionLearningBenchmark:
+    return ScafBenchmark(test_set=test_mols, sample_size=number_samples, type=type)
 
-def snn_benchmark(test_set_file: str, number_samples: int) -> DistributionLearningBenchmark:
-    smiles_list = [s.strip() for s in open(test_set_file).readlines()]
-    return SNNBenchmark(test_set=smiles_list, sample_size=number_samples)
+def snn_benchmark(test_mols: Set[str], number_samples: int) -> DistributionLearningBenchmark:
+    return SNNBenchmark(test_set=test_mols, sample_size=number_samples)
 
 def perindopril_rings() -> GoalDirectedBenchmark:
     # perindopril with two aromatic rings

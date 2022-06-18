@@ -1,7 +1,7 @@
 import logging
 import time
 from abc import abstractmethod
-from typing import Dict, Any, Iterable, List
+from typing import Dict, Any, Iterable, List, Set
 import numpy as np
 
 from guacamol.utils.math import cos_similarity
@@ -122,7 +122,7 @@ class UniquenessBenchmark(DistributionLearningBenchmark):
             logger.warning('The model could not generate enough valid molecules. The score will be penalized.')
 
         # canonicalize_list removes duplicates (and invalid molecules, but there shouldn't be any)
-        unique_molecules = canonicalize_list(molecules, include_stereocenters=False)
+        unique_molecules = canonicalize_list(molecules)
 
         unique_ratio = len(unique_molecules) / self.number_samples
         metadata = {
@@ -150,10 +150,7 @@ class NoveltyBenchmark(DistributionLearningBenchmark):
             training_set: molecules from the training set
         """
         super().__init__(name='Novelty', number_samples=number_samples)
-        if canonicalize:
-            self.training_set_molecules = set(canonicalize_list(training_set, include_stereocenters=False))
-        else:
-            self.training_set_molecules = set(training_set)
+        self.training_set_molecules = training_set
         self.return_novel = return_novel
         self.use_filters = use_filters
         self.return_train_mols = return_train_mols
@@ -175,7 +172,7 @@ class NoveltyBenchmark(DistributionLearningBenchmark):
             logger.warning('The model could not generate enough unique molecules. The score will be penalized.')
 
         # canonicalize_list in order to remove stereo information (also removes duplicates and invalid molecules, but there shouldn't be any)
-        unique_molecules = set(canonicalize_list(molecules, include_stereocenters=False))
+        unique_molecules = set(canonicalize_list(molecules))
 
         novel_molecules = unique_molecules.difference(self.training_set_molecules)
 
@@ -205,19 +202,14 @@ class KLDivBenchmark(DistributionLearningBenchmark):
     Computes the KL divergence between a number of samples and the training set for physchem descriptors
     """
 
-    def __init__(self, number_samples: int, training_set: List[str], use_filters=False,
-                 canonicalize=False) -> None:
+    def __init__(self, number_samples: int, training_set: Set[str], use_filters=False) -> None:
         """
         Args:
             number_samples: number of samples to generate from the model
             training_set: molecules from the training set
         """
         super().__init__(name='KL divergence', number_samples=number_samples)
-        if canonicalize:
-            self.training_set_molecules = canonicalize_list(get_random_subset(training_set, self.number_samples, seed=42),
-                                                            include_stereocenters=False)
-        else:
-            self.training_set_molecules = get_random_subset(training_set, self.number_samples, seed=42)
+        self.training_set_molecules = get_random_subset(training_set, self.number_samples, seed=42)
         self.pc_descriptor_subset = [
             'BertzCT',
             'MolLogP',
@@ -249,7 +241,7 @@ class KLDivBenchmark(DistributionLearningBenchmark):
             logger.warning('The model could not generate enough unique molecules. The score will be penalized.')
 
         # canonicalize_list in order to remove stereo information (also removes duplicates and invalid molecules, but there shouldn't be any)
-        unique_molecules = set(canonicalize_list(molecules, include_stereocenters=False))
+        unique_molecules = set(canonicalize_list(molecules))
 
         # first we calculate the descriptors, which are np.arrays of size n_samples x n_descriptors
         d_sampled = calculate_pc_descriptors(unique_molecules, self.pc_descriptor_subset)
@@ -306,7 +298,7 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
     """
     Computes the reconstruction accuracy for a set of holdout molecules
     """
-    def __init__(self, test_set: List[str], sample_size: int, use_filters=False,
+    def __init__(self, test_set: Set[str], sample_size: int, use_filters=False,
                  canonicalize=False) -> None:
         """
         Args:
@@ -376,7 +368,7 @@ class FragBenchmark(DistributionLearningBenchmark):
     """
     Computes the cosine similarity between generated fragments and holdout set fragments
     """
-    def __init__(self, test_set: List[str], sample_size: int, type: str, use_filters=False) -> None:
+    def __init__(self, test_set: Set[str], sample_size: int, type: str, use_filters=False) -> None:
         """
         Args:
             test_set: list of smiles to use for fragment comparison
@@ -419,7 +411,7 @@ class ScafBenchmark(DistributionLearningBenchmark):
     """
     Computes the cosine similarity between generated scaffolds and holdout set scaffolds
     """
-    def __init__(self, test_set: List[str], sample_size: int, type: str, use_filters=False) -> None:
+    def __init__(self, test_set: Set[str], sample_size: int, type: str, use_filters=False) -> None:
         """
         Args:
             test_set: list of smiles to use for scaffold comparison

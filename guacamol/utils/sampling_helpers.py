@@ -85,7 +85,7 @@ def sample_unique_molecules(model, number_molecules: int, prior_gen=[],
     return unique_list[:number_molecules]
 
 def sample_novel_molecules(model, number_molecules: int, train_mols: Union[str, List[str]],
-                           prior_gen=[], use_filters=False, max_tries=10) -> List[str]:
+                           prior_gen=[], use_filters=False, include_stereocenters=True, max_tries=10) -> List[str]:
     """
     Sample from the given generator until the desired number of novel (distinct from
     training set) molecules have been sampled
@@ -103,7 +103,7 @@ def sample_novel_molecules(model, number_molecules: int, train_mols: Union[str, 
     """
     if isinstance(train_mols, str):
         train_molecules = [s.strip() for s in open(train_mols).readlines()]
-        train_molecules = set(canonicalize_list(train_molecules, include_stereocenters=False))
+        train_molecules = set(canonicalize_list(train_molecules, include_stereocenters=include_stereocenters))
     else:
         train_molecules = set(train_mols)
 
