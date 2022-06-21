@@ -375,7 +375,7 @@ class FragBenchmark(DistributionLearningBenchmark):
         """
         super().__init__(name='Frag', number_samples=sample_size)
         self.type = type
-        self.ref_frags = fragment_list(test_set)
+        self.ref_frags = fragment_list(get_random_subset(test_set, sample_size, seed=42))
         self.use_filters = use_filters
 
     def assess_model(self, model, prior_gen=[]):
@@ -418,7 +418,7 @@ class ScafBenchmark(DistributionLearningBenchmark):
         """
         super().__init__(name='Scaf', number_samples=sample_size)
         self.type = type
-        self.ref_scafs = scaffold_list(test_set)
+        self.ref_scafs = scaffold_list(get_random_subset(test_set, sample_size, seed=42))
         self.use_filters = use_filters
 
     def assess_model(self, model, prior_gen=[]):
@@ -460,7 +460,7 @@ class SNNBenchmark(DistributionLearningBenchmark):
             sample_size: number of smiles to sample
         """
         super().__init__(name='SNN', number_samples=sample_size)
-        self.test_fps = np.vstack(get_fingerprints_from_smileslist(test_set))
+        self.test_fps = np.vstack(get_fingerprints_from_smileslist(get_random_subset(test_set, sample_size, seed=42)))
 
     def assess_model(self, model, prior_gen=[]) -> DistributionLearningBenchmarkResult:
         """
