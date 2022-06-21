@@ -194,7 +194,7 @@ def distribution_learning_suite_v2(train_mols: List[str], test_mols: List[str], 
         # IntDivBenchmark(number_samples=number_samples, p=2)
     ]
 
-    if test_scaffold_file_path is not None:
+    if test_scaffold_file_mols is not None:
         benchmarks.append(frag_benchmark(test_mols=test_scaffold_mols, number_samples=number_samples, type='test_scaffold'))
         benchmarks.append(scaf_benchmark(test_mols=test_scaffold_mols, number_samples=number_samples, type='test_scaffold'))
     if reconstruct:
