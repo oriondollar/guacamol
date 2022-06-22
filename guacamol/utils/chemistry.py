@@ -94,6 +94,8 @@ def is_valid(smiles: str):
         True if the SMILES strings corresponds to a valid, non-empty molecule.
     """
 
+    if smiles is None:
+        return False
     mol = Chem.MolFromSmiles(smiles)
 
     return smiles != '' and mol is not None and mol.GetNumAtoms() > 0
