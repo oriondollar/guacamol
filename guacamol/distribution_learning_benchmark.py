@@ -7,7 +7,7 @@ import numpy as np
 from guacamol.utils.math import cos_similarity
 from guacamol.utils.chemistry import canonicalize_list, is_valid, calculate_pc_descriptors, continuous_kldiv, \
     discrete_kldiv, calculate_internal_pairwise_similarities, tokenizer, fragment_list, scaffold_list, \
-    get_fingerprints_from_smileslist, average_agg_tanimoto, pass_through_filters
+    get_fingerprints_from_smileslist, average_agg_tanimoto, pass_through_filters, canonicalize_for_reconstruct
 from guacamol.utils.data import get_random_subset
 from guacamol.utils.sampling_helpers import sample_valid_molecules, sample_unique_molecules
 
@@ -322,7 +322,7 @@ class ReconstructionBenchmark(DistributionLearningBenchmark):
         """
         start_time = time.time()
         reconstructed_smiles = model.reconstruct(self.test_set_molecules)
-        reconstructed_smiles = canonicalize_list(reconstructed_smiles)
+        reconstructed_smiles = canonicalize_for_reconstruct(reconstructed_smiles)
         end_time = time.time()
         reconstructed_tokenized = [tokenizer(smi) for smi in reconstructed_smiles]
         smile_accs = []

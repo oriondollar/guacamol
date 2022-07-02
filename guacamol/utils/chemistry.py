@@ -142,6 +142,29 @@ def canonicalize_list(smiles_list: Iterable[str]) -> List[str]:
 
     return remove_duplicates(canonicalized_smiles)
 
+def canonicalize_for_reconstruct(smiles_list: Iterable[str]) -> List[str]:
+    """
+    Canonicalize a list of smiles. Does not remove corrupted samples
+
+    Args:
+        smiles_list: molecules as SMILES strings
+        include_stereocenters: whether to keep the stereochemical information in the canonical SMILES strings
+
+    Returns:
+        The canonicalized and filtered input smiles.
+    """
+
+    canonicalized_smiles = []
+    for smi in smiles_list:
+        can_smi = canonicalize(smi)
+        if can_smi is None:
+            canonicalized_smiles.append(smi)
+        else:
+            canonicalized_smiles.append(can_smi)
+
+    return canonicalized_smiles
+
+
 def fragment_list(smiles_list: Iterable[str]) -> Counter:
     fragments = Counter()
     mols = [Chem.MolFromSmiles(smi) for smi in smiles_list]
